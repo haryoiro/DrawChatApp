@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html>
   <head>
+      <div>
+          <meta property="og:title" content="ページタイトル" />
+          <meta property="og:type" content="サイトタイプ" />
+          <meta property="og:description" content="ページの概要" />
+        </div>
     <title>hello, drawing</title>
     <link rel="stylesheet" href="style.css">
   </head>
@@ -8,14 +13,10 @@
     <div id ="toolbar">
       <div id="rad">
         Radius <span id="radval">10</span>
-        <div id="decrad" class="radcontrol">-</div>
-        <div id="incrad" class="radcontrol">+</div>
+        <div id="decrad" class="radcontrol" href="#">-</div>
+        <div id="incrad" class="radcontrol" href="#">+</div>
       </div>
-
       <div id="colors">
-        <div class="swatch active" style="background-color: red"></div>
-        <div class="swatch" style="background-color: green"></div>
-        <div class="swatch" style="background-color: blue"></div>
       </div>
     </div>
     <canvas id ="canvas" style="display: block">
@@ -23,5 +24,6 @@
     </canvas>
     <script src="main.js"></script>
     <script src="radius.js"></script>
+    <script src="colors.js"></script>
   </body>
 </html>
