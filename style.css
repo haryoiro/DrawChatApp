@@ -8,11 +8,44 @@
   -moz-user-select: none;
   -ms-user-select: none;
 }
+#canvas{
+  cursor: crosshair;
+}
+
+#save{
+  float: right;
+  margin-left: 20px;
+  height: 30px;
+  width: 60px;
+  text-align: center;
+  padding: 3px;
+  background-color: #4f4f4f;
+
+}
+
+#save:hover{
+  background-color: #818181;
+}
+
+#clear{
+  float: right;
+  margin-left: 20px;
+  height: 30px;
+  width: 60px;
+  text-align: center;
+  padding: 3px;
+  background-color: #4f4f4f;
+
+}
+
+#clear:hover{
+  background-color: #818181;
+}
 
 #toolbar{
   width: 100%;
-  height: 80px;
-  padding: 25px;
+  height: 60px;
+  padding: 15px;
   position: fixed;
   top: 0;
   background-color: #2f2f2f;
@@ -30,6 +63,7 @@
 #rad{
   float: left;
 }
+
 #colors{
   float: right;
 }
@@ -46,3 +80,4 @@
   border: 2px solid white;
   box-shadow: inset 0px 1px 2px rgba(0, 0, 0, 0.5);
 }
+
