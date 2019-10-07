@@ -10,10 +10,10 @@ function setRadius(newRadius){
     radSpan.innerHTML = radius;
 }
 
-let minRad = 0,
-    maxRad = 100,
-    defaultRad = 10,
-    interval = 5,
+let minRad = 1,
+    maxRad = 10,
+    defaultRad = 1,
+    interval = 1,
     radSpan = document.getElementById('radval'),
     decRad = document.getElementById('decrad'),
     incRad = document.getElementById('incrad');
