@@ -1,29 +1,35 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
   <head>
-      <div>
-          <meta property="og:title" content="ページタイトル" />
-          <meta property="og:type" content="サイトタイプ" />
-          <meta property="og:description" content="ページの概要" />
-        </div>
-    <title>hello, drawing</title>
+    <div>
+      <meta charset="utf-8">
+    </div>
+    <div>
+      <meta property="og:title" content="Hello, drawing" />
+      <meta property="og:type" content="website" />
+      <meta property="og:description" content="ブラウザで簡単にお絵描きができるWebサービス(仮)" />
+    </div>
+    <title>Hello, drawing</title>
     <link rel="stylesheet" href="style.css">
   </head>
   <body style ="margin: 0">
     <div id ="toolbar">
       <div id="rad">
-        Radius <span id="radval">10</span>
+        RADIUS <span id="radval">10</span>
         <div id="decrad" class="radcontrol" href="#">-</div>
         <div id="incrad" class="radcontrol" href="#">+</div>
       </div>
-      <div id="colors">
-      </div>
+      <div id="save">Save</div>
+      <div id="clear">Clear</div>
+      <div id="colors"></div>
     </div>
     <canvas id ="canvas" style="display: block">
-      hello
+      ご使用のブラウザでは動作できません。<br>
+      最新のChrome,FireFox,Safariなどのブラウザをご用意ください。<br>
     </canvas>
     <script src="main.js"></script>
     <script src="radius.js"></script>
     <script src="colors.js"></script>
+    <script src="save.js"></script>
   </body>
 </html>
