@@ -32,10 +32,11 @@ function disengage(){
     ctx.beginPath();
 }
 
-function overcanvas(){
+function invalidata(){
     dragging = false;
     ctx.beginPath();
 }
+
 
 function clearImage() {
     let clear = document.getElementById("clear");
@@ -51,9 +52,7 @@ function clearImage() {
 canvas.addEventListener('mousedown', engage);
 canvas.addEventListener('mousemove', putPoint);
 canvas.addEventListener('mouseup', disengage);
-canvas.addEventListener('mouseleave', overcanvas);
+canvas.addEventListener('mouseleave', invalidata);
 
 
 clear.addEventListener("click", clearImage);
-
-
