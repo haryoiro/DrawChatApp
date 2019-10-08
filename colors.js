@@ -1,5 +1,5 @@
-var colors = ['Black', 'grey', 'white', 'red', 'orange',
-'yellow', 'green', 'blue', 'indigo', 'viovar'];
+var colors = ['Black', 'white', '#ff0000', '#ff8e00',
+'#ffff00', '#008e00', '#00c0c0', '#400098', '#8e008e' ];
 
 for(var i=0, n=colors.length;i<n;i++){
     var swatch = document.createElement('div');
