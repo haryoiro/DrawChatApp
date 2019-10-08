@@ -8,9 +8,9 @@ function getImage(){
     document.getElementById('i1').src = imgdata;    //id'i1'のsrcをimgdataに書き換え
 }   
 function saveImage(){
-    let data= canvas.toDataURL();
-
-    window.open(document.querySelector('canvas').toDataURL())
+    let data = canvas.toDataURL();
+    localStorage.setItem("save", data);
+    window.open(document.querySelector('canvas').toDataURL());
 
     let request = new XMLHttpRequest();
     

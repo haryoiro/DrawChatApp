@@ -2,13 +2,13 @@ const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
 
-let radius  = 10;
-let dragging= false;
-
-canvas.width    = window.innerWidth;
-canvas.height   = window.innerHeight;
-
+let radius = 10,
+    dragging = false;
+canvas.width = 1920;
+canvas.height = 1080;
 ctx.lineWidth = radius * 2;
+ctx.fillStyle = 'rgb(240,240,220)';
+ctx.fillRect(0, 0, 1920, 2080);
 
 function putPoint(e){
     if(dragging){
@@ -23,7 +23,7 @@ function putPoint(e){
 }
 
 function engage(e){
-    dragging= true;
+    dragging = true;
     putPoint(e);
 }
 

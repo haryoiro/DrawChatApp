@@ -11,7 +11,7 @@ function setRadius(newRadius){
 }
 
 let minRad = 1,
-    maxRad = 10,
+    maxRad = 20,
     defaultRad = 1,
     interval = 1,
     radSpan = document.getElementById('radval'),
@@ -22,8 +22,4 @@ let minRad = 1,
 decRad.addEventListener('click', function(){
     setRadius(radius-interval);
 });
-incRad.addEventListener('click', function(){
-    setRadius(radius+interval);
-});
-
 setRadius(defaultRad);
