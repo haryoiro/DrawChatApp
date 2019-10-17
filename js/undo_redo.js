@@ -6,9 +6,8 @@ function beforDlaw() {
   redoStack = [];
   if(undoStack.length >= STACK_MAX_SIZE){
     undoStack.pop();
-  }
+  } 
   undoStack.unshift(ctx.getImageData(0, 0, w, h));
-  console.log(undoStack);
 }
 
 function undo() {
