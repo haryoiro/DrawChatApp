@@ -10,8 +10,40 @@
 }
 #canvas{
   cursor: crosshair;
-  background: rgb(240,240,220);
+  background: rgb(241, 240, 240);
 }
+
+#toolbar{
+  width: 100%;
+  height: 60px;
+  padding: 15px;
+  position: fixed;
+  top: 0;
+  background-color: white;
+  color: white;
+  box-shadow:  inset 0px 0px 0px rgba(255, 255, 255, 0.5), 0px 0px 3px rgba(0, 0, 0, 0.5);
+}
+
+.radcontrol{
+  width: 35px;
+  height: 30px;
+  background-color: #4f4f4f;
+  display: inline-block;
+  text-align: center;
+  padding: 4px;
+  border-radius: 2px;
+  box-shadow:  inset 0px 0px 0px rgba(255, 255, 255, 0.5), 0px 2px 3px rgba(0, 0, 0, 0.5);
+}
+
+.radcontrol:hover{
+  background-color: #818181;
+}
+
+
+#rad{
+  float: left;
+}
+
 
 .ctrlButton{
   float: right;
@@ -23,42 +55,13 @@
   text-align: center;
   padding: 3px;
   border-radius: 2px;
-  box-shadow:  inset 0px 0px 0px rgba(255, 255, 255, 0.5), 0px 4px 3px rgba(0, 0, 0, 0.5);
+  box-shadow:  inset 0px 0px 0px rgba(255, 255, 255, 0.5), 0px 2px 3px rgba(0, 0, 0, 0.5);
 }
 
 .ctrlButton:hover{
   background-color: #818181;
 }
 
-#toolbar{
-  width: 100%;
-  height: 60px;
-  padding: 15px;
-  position: fixed;
-  top: 0;
-  background-color: #2f2f2f;
-  color: white;
-}
-
-.radcontrol{
-  width: 35px;
-  height: 30px;
-  background-color: #4f4f4f;
-  display: inline-block;
-  text-align: center;
-  padding: 4px;
-  border-radius: 2px;
-  box-shadow:  inset 0px 0px 0px rgba(255, 255, 255, 0.5), 0px 4px 3px rgba(0, 0, 0, 0.5);
-}
-
-.radcontrol:hover{
-  background-color: #818181;
-}
-
-
-#rad{
-  float: left;
-}
 
 #colors{
   float: right;
@@ -71,7 +74,7 @@
   display: inline-block;
   margin-left: 6px;
   border-radius: 2px;
-  box-shadow:  inset 0px 0px 0px rgba(255, 255, 255, 0.5), 0px 4px 3px rgba(0, 0, 0, 0.5);
+  box-shadow:  inset 0px 0px 0px rgba(255, 255, 255, 0.5), 0px 2px 3px rgba(0, 0, 0, 0.5);
 }
 
 .swatch.active{
