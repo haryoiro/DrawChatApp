@@ -3,8 +3,6 @@
   <head>
     <div>
       <meta charset="utf-8">
-    </div>
-    <div>
       <meta property="og:title" content="Hello, drawing" />
       <meta property="og:type" content="website" />
       <meta property="og:description" content="ブラウザで簡単にお絵描きができるWebサービス(仮)" />
@@ -15,21 +13,22 @@
   <body style ="margin: 0">
     <div id ="toolbar">
       <div id="rad">
-        RADIUS <span id="radval">10</span>
         <div id="decrad" class="radcontrol" href="#">-</div>
+        <div id="radval" class="radcontrol"></div>
         <div id="incrad" class="radcontrol" href="#">+</div>
       </div>
-      <div id="save">Save</div>
-      <div id="clear">Clear</div>
-      <div id="colors"></div>
+      <div id="clear" class="ctrlButton">Clear</div>
+      <div id="colors" ></div>
+      <div id="undo" class="ctrlButton">Undo</div>
+      <div id="redo" class="ctrlButton">Redo</div>
     </div>
-    <canvas id ="canvas" style="display: block">
-      ご使用のブラウザでは動作できません。<br>
-      最新のChrome,FireFox,Safariなどのブラウザをご用意ください。<br>
-    </canvas>
-    <script src="main.js"></script>
-    <script src="radius.js"></script>
-    <script src="colors.js"></script>
-    <script src="save.js"></script>
+      <canvas id ="canvas" style="display: block">
+      このサイトはご使用のブラウザでは正常に動作しない可能性があります。。<br>
+      最新のChrome,FireFox,Safariなどの最新のブラウザをご利用ください。<br>
+      </canvas>
+    <script src="js/main.js"></script>
+    <script src="js/radius.js"></script>
+    <script src="js/colors.js"></script>
+    <script src="js/undo_redo.js"></script>
   </body>
 </html>
