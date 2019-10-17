@@ -22,7 +22,8 @@ function putPoint(e) {
         ctx.lineTo(x, y);
         ctx.stroke();
         ctx.beginPath();
-        ctx.arc(x, y, radius, 0, Math.PI * 2);
+        ctx.arc(x, y, radius, 0, Math.PI * 2)
+        ctx.fill();
         ctx.beginPath();
         ctx.moveTo(x, y);
     }
