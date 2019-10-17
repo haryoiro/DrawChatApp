@@ -22,4 +22,7 @@ let minRad = 1,
 decRad.addEventListener('click', function(){
     setRadius(radius-interval);
 });
+incRad.addEventListener('click', function(){
+    setRadius(radius+interval);
+});
 setRadius(defaultRad);
