@@ -10,53 +10,23 @@
 }
 #canvas{
   cursor: crosshair;
+  background: rgb(240,240,220);
 }
 
-#save{
+.ctrlButton{
   float: right;
-  margin-left: 20px;
-  height: 30px;
   width: 60px;
+  height: 30px;
+  background-color: #4f4f4f;
+  margin-left: 6px;
+  display: inline-block;
   text-align: center;
   padding: 3px;
-  background-color: #4f4f4f;
   border-radius: 2px;
   box-shadow:  inset 0px 0px 0px rgba(255, 255, 255, 0.5), 0px 4px 3px rgba(0, 0, 0, 0.5);
 }
 
-#save:hover{
-  background-color: #818181;
-}
-
-#clear{
-  float: right;
-  margin-left: 20px;
-  height: 30px;
-  width: 60px;
-  text-align: center;
-  padding: 3px;
-  background-color: #4f4f4f;
-  border-radius: 2px;
-  box-shadow:  inset 0px 0px 0px rgba(255, 255, 255, 0.5), 0px 4px 3px rgba(0, 0, 0, 0.5);
-}
-
-#clear:hover{
-  background-color: #818181;
-}
-
-#undo{
-  float: right;
-  margin-left: 20px;
-  height: 30px;
-  width: 60px;
-  text-align: center;
-  padding: 3px;
-  background-color: #4f4f4f;
-  border-radius: 2px;
-  box-shadow:  inset 0px 0px 0px rgba(255, 255, 255, 0.5), 0px 4px 3px rgba(0, 0, 0, 0.5);
-}
-
-#undo:hover{
+.ctrlButton:hover{
   background-color: #818181;
 }
 
@@ -69,8 +39,9 @@
   background-color: #2f2f2f;
   color: white;
 }
+
 .radcontrol{
-  width: 30px;
+  width: 35px;
   height: 30px;
   background-color: #4f4f4f;
   display: inline-block;
@@ -80,34 +51,19 @@
   box-shadow:  inset 0px 0px 0px rgba(255, 255, 255, 0.5), 0px 4px 3px rgba(0, 0, 0, 0.5);
 }
 
+.radcontrol:hover{
+  background-color: #818181;
+}
+
+
 #rad{
   float: left;
 }
 
-#radtext{
-  float: left;
-  height: 30px;
-  width: 56px;
-  text-align: center;
-  padding: 4px;
-}
-
-#radval{
-  float: left;
-  margin-right: 6px;
-  height: 30px;
-  width: 40px;
-  text-align: center;
-  padding: 4px;
-  background-color: #4f4f4f;
-  border-radius: 2px;
-  box-shadow:  inset 0px 0px 0px rgba(255, 255, 255, 0.5), 0px 4px 3px rgba(0, 0, 0, 0.5);
-}
-
-
 #colors{
   float: right;
 }
+
 .swatch{
   width: 30px;
   height: 30px;
@@ -126,4 +82,3 @@
   margin-left: 6px;
   border-radius: 2px;
 }
-
