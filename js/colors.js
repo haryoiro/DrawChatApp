@@ -1,5 +1,5 @@
-let colors = ['Black', 'white', '#ff0000', '#ff8e00',
-'#ffff00', '#008e00', '#00c0c0', '#400098', '#8e008e' ];
+let colors = ['Black','Gray', 'rgb(241, 240, 240)', '#6CC3BD', '#5A819E',
+'#7C7AA1', '#F67E7D', '#FFE5C4'];
 
 for(let i=0, n=colors.length;i<n;i++){
     let swatch = document.createElement('div');
