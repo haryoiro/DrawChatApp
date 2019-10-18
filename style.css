@@ -30,7 +30,7 @@
   background-color: #4f4f4f;
   display: inline-block;
   text-align: center;
-  padding: 4px;
+  padding: 6px;
   border-radius: 2px;
   box-shadow:  inset 0px 0px 0px rgba(255, 255, 255, 0.5), 0px 2px 3px rgba(0, 0, 0, 0.5);
 }
@@ -55,7 +55,7 @@
   margin-left: 6px;
   display: inline-block;
   text-align: center;
-  padding: 3px;
+  padding: 5px;
   border: solid 1px #4f4f4f;
   border-radius: 2px;
   box-shadow:  inset 0px 0px 0px rgba(255, 255, 255, 0.5), 0px 2px 3px rgba(0, 0, 0, 0.5);
