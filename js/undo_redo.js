@@ -1,7 +1,7 @@
 document.getElementById('undo').addEventListener('click', undo);
 document.getElementById('redo').addEventListener('click', redo);
 
-
+// ペンを走らせると画像を配列に保存する
 function beforDlaw() {
   redoStack = [];
   if(undoStack.length >= STACK_MAX_SIZE){
@@ -11,13 +11,13 @@ function beforDlaw() {
 }
 
 function undo() {
-  // undoのデータ数が0以下ならreturn
+  // やり直しデータがなかった場合何もしない
   if (undoStack.length <= 0) {
     return;
   }
-  // redoStackにキャンバスの状態を保存し配列をunshift
+  // 現在のイメージを保存
   redoStack.unshift(ctx.getImageData(0, 0, w, h));
-  // imageDataにundoStackの配列の左端を代入及び削除(shift)
+  // 古いイメージを削除
   let imageData = undoStack.shift();
   // imageDataの状態をキャンバスに描画
   ctx.putImageData(imageData, 0, 0);
