@@ -9,29 +9,42 @@
     </div>
     <title>Hello, drawing</title>
     <link rel="stylesheet" href="./style.css" />
-    <link rel="stylesheet" href="./hint.css" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css" integrity="sha384-REHJTs1r2ErKBuJB0fCK99gCYsVjwxHrSU0N7I1zl9vZbggVJXRMsv/sLlOAGb4M" crossorigin="anonymous">
   </head>
-  <body style ="margin: 0">
-    <div id ="toolbar">
-      <div id="rad" class="hint--bottom" aria-label="PENCIL SIZE">
-        <div id="decrad" class="radcontrol" href="#">-</div>
-        <div id="radval" class="radcontrol" aria-label="PENCIL SIZE">me</div>
-        <div id="incrad" class="radcontrol" href="#">+</div>
+  <body>
+    <div class="wrapper">
+      <input type="checkbox" id="chk">
+      <label for="chk" class="show-menu-btn">
+        <i class="fas fa-ellipsis-h"></i>
+      </label>
+
+      <div id ="toolbar" class="toolbar">
+        <div class="tool-button">
+          <button id="incrad" class="rad buttons button">+</button>
+          <button id="radval" class="rad buttons button">1</button>
+          <button id="decrad" class="rad buttons button">-</button>
+          <button id="clear" class="buttons button"></button>
+          <button id="colors" class="buttons button"></button>
+          <button id="undo" class="undo buttons button"><i class="fas fa-undo"></i></button>
+          <button id="redo" class="redo buttons button"><i class="fas fa-redo"></i></button>
+        </div>
+
+        <label for="chk" class="hide-menu-btn">
+          <i class="fas fa-times"></i>
+        </label>
       </div>
-      <div id="clear" class="ctrlButton">Clear</div>
-      <div id="colors" ></div>
-      <div id="undo" class="ctrlButton">Undo</div>
       
-      <div id="redo" class="ctrlButton">Redo</div>
-    </div>
-    
-      <canvas id ="canvas" style="display: block">
-      このサイトはご使用のブラウザでは正常に動作しない可能性があります。。<br>
-      最新のChrome,FireFox,Safariなどの最新のブラウザをご利用ください。<br>
+      <canvas id="canvas">
+        <h1>お使いのブラウザは非対応です</h1>
+        <h1>最新のブラウザのダウンロードをお願いします。</h1>
       </canvas>
+    </div>
+    <script src="js/windowConf.js"></script>
+    
     <script src="js/main.js"></script>
+    <script src="js/undo_redo.js"></script>
     <script src="js/radius.js"></script>
     <script src="js/colors.js"></script>
-    <script src="js/undo_redo.js"></script>
+    
   </body>
 </html>
