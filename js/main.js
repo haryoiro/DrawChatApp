@@ -13,6 +13,8 @@ const conf = {
 	my: 0,
 	// クリックされているかの判定
 	pointToggle: false,
+	// 消しゴム判定
+  eraserToggle:false,
 	// 初期画面サイズ
 	w:1024,
 	h:768,
@@ -30,6 +32,12 @@ function thisPoint(e){
 // ---- マウスイベント時 ツール関数 ----
 // 鉛筆ツール
 function putPoint(e) {
+	if (conf.eraserToggle){
+    ctx.globalCompositeOperation = 'destination-out'
+  } else {
+    ctx.globalCompositeOperation = 'source-over'
+    ctx.strokeStyle = '#FF6566'
+  }
   if (conf.pointToggle) {
 		thisPoint(e)
 		ctx.lineTo(conf.mx, conf.my);
@@ -84,15 +92,6 @@ function handlemove(e) {
   }
 }
 
-// // ---- カーソル描画 ----
-// function drawPointerCursor(context){
-// 	ctx.beginPath()
-//   ctx.arc(conf.mx + 5, conf.my + 5, conf.radius, 0,  Math.PI * 2)
-//   ctx.fill()
-// }
-
-
-
 
 window.addEventListener('load',(() => {
   const canvas = document.getElementById("canvas");
@@ -106,7 +105,8 @@ window.addEventListener('load',(() => {
   // ツール関係, イベントリスナー
   const clear = document.getElementById('clear')
 	clear.addEventListener('click', clearAllCanvas)
-
+  const era = document.getElementById('era').addEventListener('click', ()=>{conf.eraserToggle=true})
+  const pen = document.getElementById('pen').addEventListener('click', ()=>{conf.eraserToggle=false})
   if (window.PointerEvent) {
     canvas.addEventListener('pointerdown', handledown, { passive: false })
     canvas.addEventListener('pointerup', handleup, { passive: false })
