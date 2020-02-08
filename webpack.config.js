@@ -1,9 +1,11 @@
 const path = require('path')
+const shorthash = Math.random().toString(36).slice(-5)
 const nodeExtarnals = require("webpack-node-externals")
 const NodemonPlugin = require("nodemon-webpack-plugin")
+const HtmlWebpackPlugin = require("html-webpack-plugin")
 
 module.exports = [{
-  // // ---- ブラウザで動く機能のバンドル
+  // // ---- クライアント機能のバンドル ----
   // モード選択
   // development -> ソースマップ有効
   // production  -> 最適化有効
@@ -15,22 +17,34 @@ module.exports = [{
   },
   // 出力設定
   output: {
-    filename: 'bundle.js',
+    publicPath: "/",
+    filename: `bundle.js?${shorthash}`,
     // expressでpublicフォルダ直下を静的に読み込むように設定するので、そこへ出力
-    path: `${__dirname}/public/js`
+    path: `${__dirname}/public`
   },
   module: {
     rules: [{
-        // 拡張子 .ts の場合
+        // .ts の場合読み込むモジュール
         test: /\.ts$/,
         use: "ts-loader",
         exclude: /node_modules/,
+      },
+      {
+        // .pug の場合読み込むモジュール
+        test: /\.pug$/,
+        use: 'pug-loader'
       }
     ]
   },
   resolve: {
     extensions: [".js",".ts"]
   },
+  plugins: [
+    new HtmlWebpackPlugin({
+      template:  path.join(__dirname, 'src/client/view/index.pug'),
+      filename: "index.html"
+    })
+  ]
 }, {
   // // ---- Nodeサーバーで動く機能をバンドル
   // モード選択
@@ -53,6 +67,7 @@ module.exports = [{
   externals: [nodeExtarnals()],
   module: {
     rules: [{
+      // .ts の場合読み込むモジュール
       test: /\.ts$/,
       use: "ts-loader",
       exclude: "/node_modules/",
