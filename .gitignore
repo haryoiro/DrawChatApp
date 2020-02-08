@@ -1,3 +1,20 @@
-node_modules
-./build/**
-/npm-debug.log
+# Logs
+logs
+
+# OS X
+.DS_Store*
+Icon?
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Node
+node_modules/
+package-lock.json
+*.log
+*.gz
+./dist/server.js
+./public/**
