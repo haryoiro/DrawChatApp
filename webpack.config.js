@@ -1,5 +1,4 @@
 const path = require('path')
-const shorthash = Math.random().toString(36).slice(-5)
 const nodeExtarnals = require("webpack-node-externals")
 const NodemonPlugin = require("nodemon-webpack-plugin")
 const HtmlWebpackPlugin = require("html-webpack-plugin")
@@ -13,12 +12,12 @@ module.exports = [{
 
   // エントリーポイントの設定（メインとなるJavaScriptファイル）
   entry: {
-    client: "./src/client/index.ts"
+    client: "./src/client/index.js"
   },
   // 出力設定
   output: {
     publicPath: "/",
-    filename: `bundle.js?${shorthash}`,
+    filename: `bundle.js`,
     // expressでpublicフォルダ直下を静的に読み込むように設定するので、そこへ出力
     path: `${__dirname}/public`
   },

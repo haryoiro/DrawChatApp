@@ -1,12 +1,40 @@
 doctype html
-head
-  meta(charset='UTF-8')
-  meta(name='viewport' content='width=device-width, initial-scale=1.0')
-  meta(http-equiv='X-UA-Compatible' content='ie=edge')
-  title DrawAndChat
-form
-  input(type='text')
-  button send
-ul
-
-script(src='./js/bundle.js')
+html(lang='ja')
+  head
+  body
+    div
+      meta(charset='utf-8')
+      meta(property='og:title', content='Hello, drawing')
+      meta(property='og:type', content='website')
+      meta(property='og:description', content='ブラウザで簡単にお絵描きができるWebサービス(仮)')
+    title Hello, drawing
+    link(rel='stylesheet', href='./style.css')
+    link(href='https://fonts.googleapis.com/css?family=Roboto:700&display=swap', rel='stylesheet')
+    link(rel='stylesheet', href='https://use.fontawesome.com/releases/v5.12.0/css/all.css', integrity='sha384-REHJTs1r2ErKBuJB0fCK99gCYsVjwxHrSU0N7I1zl9vZbggVJXRMsv/sLlOAGb4M', crossorigin='anonymous')
+    .wrapper
+      input#chk(type='checkbox')
+      label.show-menu-btn(for='chk')
+        i.fas.fa-ellipsis-h
+      #toolbar.toolbar
+        .tool-button
+          button#incrad.rad.buttons.button
+            i.fas.fa-plus
+          button#radval.rad.buttons.button 1
+          button#decrad.rad.buttons.button
+            i.fas.fa-minus
+          button#clear.buttons.button
+          button#colors.buttons.button
+          button#era.buttons.button
+            i.fas.fa-eraser
+          button#pen.buttons.button
+            i.fas.fa-pen
+          button#undo.undo.buttons.button
+            i.fas.fa-undo
+          button#redo.redo.buttons.button
+            i.fas.fa-redo
+        label.hide-menu-btn(for='chk')
+          i.fas.fa-times
+      canvas#canvas
+        h1 お使いのブラウザは非対応です
+        h1 最新のブラウザのダウンロードをお願いします。
+  script(src="./bundle.js")
