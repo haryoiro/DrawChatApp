@@ -20,6 +20,7 @@ const conf = {
 	undoStack:[],
 	redoStack:[],
   eraserToggle:false,
+  eC:[]
 }
 
 function thisPoint(e){
@@ -39,11 +40,10 @@ function putPoint(e) {
   }
   if (conf.pointToggle) {
 		thisPoint(e)
-    ctx.lineCap = 'round'
 		ctx.lineTo(conf.mx, conf.my)
 		ctx.stroke()
 		ctx.beginPath()
-		ctx.moveTo(conf.mx, conf.my)
+    ctx.moveTo(conf.mx, conf.my)
 	}
 }
 //ドラッグ開始時
@@ -64,41 +64,55 @@ function clearAllCanvas() {
 // ---- タッチイベント時 ツール関数 ----
 // ポインター接触時のポインタータイプを判定
 function handledown(e) {
+  e.preventDefault()
+  conf.pType = e.pointerType
+  conf.eC.push(e)
 	ctx.beginPath()
   conf.pointToggle = true
-  conf.pType = e.pointerType
 }
+
 // ドラッグ終了
 function handleup(e) {
-  conf.pointToggle = false;
+  ctx.beginPath()
+  conf.pointToggle = false
+  remove_event(e)
 }
 // ポインタータイプに合わせた処理を実行
 function handlemove(e) {
-  switch (conf.pType) {
-    case "mouse":
-			conf.pType = "mouse"
-			putPoint(e)
-      break
-    case "touch":
-      conf.pType = "touch"
-			e.preventDefault()
-			putPoint(e)
-      break;
-    case "pen":
-      conf.pType = "pen"
-			putPoint(e)
-			e.preventDefault()
-      break;
+  // 格納したイベントの数分イベントを再格納
+  for (let i = 0; i < conf.eC.length; i++) {
+    if (e.pointerId == conf.eC[i].pointerId) {
+      conf.eC[i] = e;
+    }	
+    if (conf.eraserToggle){
+      ctx.globalCompositeOperation = 'destination-out'
+    } else {
+      ctx.globalCompositeOperation = 'source-over'
+      ctx.strokeStyle = '#FF6566'
+    }
+    if (conf.pointToggle) {
+      let touch = conf.eC[i]
+      let rect = touch.target.getBoundingClientRect()
+      let x = conf.eC[0].clientX - Math.floor(rect.left)
+      let y = conf.eC[0].clientY - Math.floor(rect.top)
+      console.log('page'+touch.pageX + ':' + touch.pageY)
+      console.log('client'+touch.clientX+':'+touch.clientY)
+      ctx.lineTo(x,y)
+      ctx.stroke()
+      ctx.fill()
+      ctx.beginPath()
+      ctx.moveTo(x,y)
+    }
   }
 }
-
-// // ---- カーソル描画 ----
-// function drawPointerCursor(context){
-// 	ctx.beginPath()
-//   ctx.arc(conf.mx + 5, conf.my + 5, conf.radius, 0,  Math.PI * 2)
-//   ctx.fill()
-// }
-
+function remove_event(e) {
+  for (let i = 0; i < eC.length; i++) {
+    if (conf.eC[i].pointerId == e.pointerId) {
+      conf.eC.splice(i, 1);
+      break;
+    }
+  }
+}
 window.addEventListener('load',(() => {
   const canvas = document.getElementById("canvas");
   const ctx = canvas.getContext("2d");
@@ -108,6 +122,7 @@ window.addEventListener('load',(() => {
 
   isImageSmoothingEnabled(ctx, false);
 
+  ctx.lineCap = 'round'
   // ツール関係, イベントリスナー
   const clear = document.getElementById('clear')
 	clear.addEventListener('click', clearAllCanvas)
