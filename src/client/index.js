@@ -162,7 +162,7 @@ function setColor(color){
 }
 
 function setSwatch(e){
-    var swatch = e.target;
+    let swatch = e.target;
     setColor(swatch.style.backgroundColor);
     swatch.className += ' active';
 }
