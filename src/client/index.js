@@ -168,15 +168,16 @@ function setSwatch(e){
 }
 
 setSwatch({target: document.getElementsByClassName('swatch')[0]});
+
 let radConf ={
     minRad:1,
     maxRad:20,
     defaultRad:1,
     interval:1,
 }
-radSpan = document.getElementById('radval'),
-decRad = document.getElementById('decrad').addEventListener('click', function(){setRad(conf.radius-radConf.interval);}),
-incRad = document.getElementById('incrad').addEventListener('click', function(){setRad(conf.radius+radConf.interval);});
+let radSpan = document.getElementById('radval'),
+    decRad = document.getElementById('decrad').addEventListener('click', function(){setRad(conf.radius-radConf.interval);}),
+    incRad = document.getElementById('incrad').addEventListener('click', function(){setRad(conf.radius+radConf.interval);});
 
 
 function setRad(newRad){

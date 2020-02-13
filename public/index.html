@@ -1,1 +1,87 @@
-<!DOCTYPE html><html lang="ja"><head></head><body><div><meta charset="utf-8"><meta property="og:title" content="Hello, drawing"><meta property="og:type" content="website"><meta property="og:description" content="ブラウザで簡単にお絵描きができるWebサービス(仮)"></div><title>Hello, drawing</title><link rel="stylesheet" href="./style.css"><link href="https://fonts.googleapis.com/css?family=Roboto:700&amp;display=swap" rel="stylesheet"><link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css" integrity="sha384-REHJTs1r2ErKBuJB0fCK99gCYsVjwxHrSU0N7I1zl9vZbggVJXRMsv/sLlOAGb4M" crossorigin="anonymous"><div class="wrapper"><input id="chk" type="checkbox"><label class="show-menu-btn" for="chk"><i class="fas fa-ellipsis-h"></i></label><div class="toolbar" id="toolbar"><div class="tool-button"><button class="rad buttons button" id="incrad"><i class="fas fa-plus"></i></button><button class="rad buttons button" id="radval">1</button><button class="rad buttons button" id="decrad"><i class="fas fa-minus"></i></button><button class="buttons button" id="clear"></button><button class="buttons button" id="colors"></button><button class="buttons button" id="era"><i class="fas fa-eraser"></i></button><button class="buttons button" id="pen"><i class="fas fa-pen"></i></button><button class="undo buttons button" id="undo"><i class="fas fa-undo"></i></button><button class="redo buttons button" id="redo"><i class="fas fa-redo"></i></button></div><label class="hide-menu-btn" for="chk"><i class="fas fa-times"></i></label></div><canvas id="canvas"><h1>お使いのブラウザは非対応です</h1><h1>最新のブラウザのダウンロードをお願いします。</h1></canvas></div><script type="text/javascript" src="/bundle.js"></script></body><script src="./bundle.js"></script></html>
+Html Webpack Plugin:
+<pre>
+  Error: Child compilation failed:
+  Module build failed (from ./node_modules/pug-loader/index.js):
+  Error: Cannot find module 'pug'
+  
+  - v8-compile-cache.js:166 Function.resolve
+    [App-Drawn]/[v8-compile-cache]/v8-compile-cache.js:166:23
+  
+  
+  - Error: Cannot find module 'pug'
+  
+  - compiler.js:79 childCompiler.runAsChild
+    [App-drawn]/[html-webpack-plugin]/lib/compiler.js:79:16
+  
+  - Compiler.js:343 compile
+    [App-Drawn]/[webpack]/lib/Compiler.js:343:11
+  
+  - Compiler.js:681 hooks.afterCompile.callAsync.err
+    [App-Drawn]/[webpack]/lib/Compiler.js:681:15
+  
+  
+  - Hook.js:154 AsyncSeriesHook.lazyCompileHook
+    [App-Drawn]/[tapable]/lib/Hook.js:154:20
+  
+  - Compiler.js:678 compilation.seal.err
+    [App-Drawn]/[webpack]/lib/Compiler.js:678:31
+  
+  
+  - Hook.js:154 AsyncSeriesHook.lazyCompileHook
+    [App-Drawn]/[tapable]/lib/Hook.js:154:20
+  
+  - Compilation.js:1423 hooks.optimizeAssets.callAsync.err
+    [App-Drawn]/[webpack]/lib/Compilation.js:1423:35
+  
+  
+  - Hook.js:154 AsyncSeriesHook.lazyCompileHook
+    [App-Drawn]/[tapable]/lib/Hook.js:154:20
+  
+  - Compilation.js:1414 hooks.optimizeChunkAssets.callAsync.err
+    [App-Drawn]/[webpack]/lib/Compilation.js:1414:32
+  
+  
+  - Hook.js:154 AsyncSeriesHook.lazyCompileHook
+    [App-Drawn]/[tapable]/lib/Hook.js:154:20
+  
+  - Compilation.js:1409 hooks.additionalAssets.callAsync.err
+    [App-Drawn]/[webpack]/lib/Compilation.js:1409:36
+  
+  
+  - Hook.js:154 AsyncSeriesHook.lazyCompileHook
+    [App-Drawn]/[tapable]/lib/Hook.js:154:20
+  
+  - Compilation.js:1405 hooks.optimizeTree.callAsync.err
+    [App-Drawn]/[webpack]/lib/Compilation.js:1405:32
+  
+  
+  - Hook.js:154 AsyncSeriesHook.lazyCompileHook
+    [App-Drawn]/[tapable]/lib/Hook.js:154:20
+  
+  - Compilation.js:1342 Compilation.seal
+    [App-Drawn]/[webpack]/lib/Compilation.js:1342:27
+  
+  - Compiler.js:675 compilation.finish.err
+    [App-Drawn]/[webpack]/lib/Compiler.js:675:18
+  
+  - Compilation.js:1261 hooks.finishModules.callAsync.err
+    [App-Drawn]/[webpack]/lib/Compilation.js:1261:4
+  
+  
+  - Hook.js:154 AsyncSeriesHook.lazyCompileHook
+    [App-Drawn]/[tapable]/lib/Hook.js:154:20
+  
+  - Compilation.js:1253 Compilation.finish
+    [App-Drawn]/[webpack]/lib/Compilation.js:1253:28
+  
+  - Compiler.js:672 hooks.make.callAsync.err
+    [App-Drawn]/[webpack]/lib/Compiler.js:672:17
+  
+  
+  - Compilation.js:1185 _addModuleChain
+    [App-Drawn]/[webpack]/lib/Compilation.js:1185:12
+  
+  - Compilation.js:1097 processModuleDependencies.err
+    [App-Drawn]/[webpack]/lib/Compilation.js:1097:9
+  
+</pre><script type="text/javascript" src="/bundle.js"></script>

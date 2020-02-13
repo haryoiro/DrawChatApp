@@ -54,6 +54,13 @@ module.exports = [{
   // エントリーポイントの設定（メインとなるJavaScriptファイル）
   entry: {
     server: "./src/server/index.ts"
+  },  
+  // 出力設定
+  output: {
+    publicPath: "/",
+    filename: `bundle.js`,
+    // expressでpublicフォルダ直下を静的に読み込むように設定するので、そこへ出力
+    path: `${__dirname}/dist`
   },
   target: "node",
   node: {
