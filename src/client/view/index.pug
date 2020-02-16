@@ -1,40 +1,14 @@
 doctype html
 html(lang='ja')
   head
+    meta(charset='utf-8')
+
+    title DRAWN
+    meta(property='og:title', content='Hello, drawing')
+    meta(property='og:type', content='website')
+    meta(property='og:description', content='ブラウザで簡単にお絵描きができるWebサービス(仮)')
   body
-    div
-      meta(charset='utf-8')
-      meta(property='og:title', content='Hello, drawing')
-      meta(property='og:type', content='website')
-      meta(property='og:description', content='ブラウザで簡単にお絵描きができるWebサービス(仮)')
-    title Hello, drawing
-    link(rel='stylesheet', href='./style.css')
-    link(href='https://fonts.googleapis.com/css?family=Roboto:700&display=swap', rel='stylesheet')
-    link(rel='stylesheet', href='https://use.fontawesome.com/releases/v5.12.0/css/all.css', integrity='sha384-REHJTs1r2ErKBuJB0fCK99gCYsVjwxHrSU0N7I1zl9vZbggVJXRMsv/sLlOAGb4M', crossorigin='anonymous')
-    .wrapper
-      input#chk(type='checkbox')
-      label.show-menu-btn(for='chk')
-        i.fas.fa-ellipsis-h
-      #toolbar.toolbar
-        .tool-button
-          button#incrad.rad.buttons.button
-            i.fas.fa-plus
-          button#radval.rad.buttons.button 1
-          button#decrad.rad.buttons.button
-            i.fas.fa-minus
-          button#clear.buttons.button
-          button#swatch.buttons.button.swatch
-          button#era.buttons.button
-            i.fas.fa-eraser
-          button#pen.buttons.button
-            i.fas.fa-pen
-          button#undo.undo.buttons.button
-            i.fas.fa-undo
-          button#redo.redo.buttons.button
-            i.fas.fa-redo
-        label.hide-menu-btn(for='chk')
-          i.fas.fa-times
-      canvas#canvas
-        h1 お使いのブラウザは非対応です
-        h1 最新のブラウザのダウンロードをお願いします。
-  script(src="./bundle.js")
+    canvas#canvas
+      h1 お使いのブラウザは非対応です
+      h1 最新のブラウザのダウンロードをお願いします。
+    script(src="./bundle.js")
