@@ -16,8 +16,8 @@ node_modules/
 package-lock.json
 *.log
 *.gz
-./dist/server.js
-./public/**
+./dist
+./public
 
 #fireba
 firebase.json
