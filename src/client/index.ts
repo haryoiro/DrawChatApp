@@ -1,3 +1,5 @@
+import { format } from "url"
+
 class Application {
   canvas: HTMLCanvasElement
   ctx: any
@@ -53,7 +55,6 @@ class Application {
     context.imageSmoothingEnabled = bool
   }
 }
-
 class DrawEvents {
   element: HTMLCanvasElement
   ctx: CanvasRenderingContext2D
@@ -68,7 +69,7 @@ class DrawEvents {
 
   public thisPoints(event: MouseEvent, rect: ClientRect){
     this.x =  event.clientX - Math.floor(rect.left)
-    this.y =  event.clientY 
+    this.y =  event.clientY - Math.floor(rect.top)
   }
   public mousePoints(){
     return {x: this.x, y: this.y}
@@ -79,6 +80,7 @@ class DrawEvents {
   }
 }
 
+let eventStack: PointerEvent[] = []
 class Tools {
   element: HTMLCanvasElement
   context: CanvasRenderingContext2D
@@ -87,18 +89,50 @@ class Tools {
   canvasColor: string
   drawToggle: boolean
   eraserToggle: boolean
-  eventStack: any[]
   constructor(element: HTMLCanvasElement, context?: CanvasRenderingContext2D){
     this.element = element
     this.context = this.element.getContext('2d')
+  }  
+  public pencilTool(e:PointerEvent){
+    //Context2D初期化
+    //@ts-ignore
+    let a:any = e.target.getContext("2d")
+    //ポインター毎イベントを配列に保存しそれぞれ使用できるようにする
+    for (let i = 0; i < eventStack.length; i++) {
+      if (e.pointerId == eventStack[i].pointerId) { 
+        eventStack[i] = e
+    }} 
+    //消しゴムトグル
+    if (this.eraserToggle){
+      a.globalCompositeOperation = 'destination-out'
+    } else {
+      a.globalCompositeOperation = 'source-over'
+    }
+    
+    // 現在のポインター座標を取得
+    // {x: number, y: number}
+    let obj: {[s: string]: number} = DrawEvent.harvestPoints(eventStack[0], app.rect)
+
+    a.strokeStyle = this.canvasColor
+    a.fillStyle =   this.canvasColor
+    a.lineCap = 'round'
+
+    a.lineTo(obj.x, obj.y)
+    a.stroke()
+    a.beginPath()
+    a.moveTo(obj.x, obj.y)
   }
   public handledown(e: PointerEvent){
     this.drawToggle = true
-    this.eventStack.push(e)
+    eventStack.push(e)
     e.preventDefault()
   }
   public handleup(e: PointerEvent){
     this.drawToggle = false
+    //@ts-ignore
+    let a:any = e.target.getContext("2d")
+    a.beginPath()
+    this.removeEventStack(e)
   }
 
   public handlemove(e: PointerEvent){  // 格納したイベントの数分イベントを再格納
@@ -106,33 +140,14 @@ class Tools {
       this.pencilTool(e)
     }
   }
-  public pencilTool(e){
-      //@ts-ignore
-      let a:any = e.target.getContext("2d")
-
-      for (let i = 0; i < this.eventStack.length; i++) {
-        if (e.pointerId == this.eventStack[i].pointerId) { 
-          this.eventStack[i] = e
-      }} 
-
-      if (this.eraserToggle){
-        a.globalCompositeOperation = 'destination-out'
-      } else {
-        a.globalCompositeOperation = 'source-over'
+  private removeEventStack(e: PointerEvent){
+    for(let i = 0;i < eventStack.length; i++){
+      if(eventStack[i].pointerId == e.pointerId){
+        eventStack.splice(i, 1)
       }
-      
-      // 現在のポインター座標を取得
-      // {x: number, y: number}
-      let obj: {[s: string]: number} = DrawEvent.harvestPoints(this.eventStack[0], app.rect)
-
-      a.strokeStyle = this.canvasColor
-      a.fillStyle =   this.canvasColor
-      a.lineCap = 'round'
-      a.lineTo(obj.x, obj.y)
-      a.stroke()
-      a.beginPath()
-      a.moveTo(obj.x, obj.y)
+    }
   }
+
   public setPencilColor(color: string){
     this.canvasColor = color
   }
@@ -142,7 +157,9 @@ const graph: HTMLCanvasElement = document.querySelector('#canvas')
 const c: CanvasRenderingContext2D = graph.getContext('2d')
 
 const app = new Application(graph, c, 1080, 720)
-app.init(c, "#0999", true, false)
+// app.prototype.init (context , backgroundColor, hidemenu, smoothRendering)
+app.init(c, "#0999", true, true)
+document.body.style.touchAction = 'none'
 
 const DrawEvent = new DrawEvents(graph, c)
 
@@ -152,23 +169,17 @@ c.beginPath()
 if(window.PointerEvent){
   const c: CanvasRenderingContext2D = graph.getContext('2d')
   let draw = new Tools(graph, c)
-    graph.addEventListener('pointermove', (e)=>{
-      DrawEvent.harvestPoints(e, app.rect, (pointsXY) => {})
-    })
-
-    graph.addEventListener('pointerdown', draw.handledown)
-    graph.addEventListener('pointerup',   draw.handleup)
-    graph.addEventListener('pointermove', draw.handlemove)
-		graph.addEventListener('pointerleave',draw.handleup)
+    graph.addEventListener('pointerdown', e=>draw.handledown(e))
+    graph.addEventListener('pointerup',   e=>draw.handleup(e))
+    graph.addEventListener('pointermove', e=>draw.handlemove(e))
+		graph.addEventListener('pointerleave',e=>draw.handleup(e))
 } else {
-    graph.addEventListener('mousemove',(e)=>{
-      DrawEvent.harvestPoints(e, app.rect, (p) => {console.log(p)})
-    })
-
-    graph.addEventListener('mousedown', engage)
-    graph.addEventListener('mousemove', putPoint)
-		graph.addEventListener('mouseup',   disengage)
-		graph.addEventListener('mouseover', disengage)
+    const c: CanvasRenderingContext2D = graph.getContext('2d')
+    let draw = new Tools(graph, c)
+    graph.addEventListener('mousedown', e=>draw.handlemousedown(e))
+    graph.addEventListener('mousemove', e=>draw.handlemouseup(e))
+		graph.addEventListener('mouseup',   e=>draw.handlemousemove(e))
+		graph.addEventListener('mouseover', e=>draw.handlmouseeup(e))
 }
 
 (setInterval (()=> {
