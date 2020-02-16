@@ -1,12 +1,14 @@
 doctype html
-head
-  meta(charset='UTF-8')
-  meta(name='viewport' content='width=device-width, initial-scale=1.0')
-  meta(http-equiv='X-UA-Compatible' content='ie=edge')
-  title DrawAndChat
-form
-  input(type='text')
-  button send
-ul
+html(lang='ja')
+  head
+    meta(charset='utf-8')
 
-script(src='./js/bundle.js')
+    title DRAWN
+    meta(property='og:title', content='Hello, drawing')
+    meta(property='og:type', content='website')
+    meta(property='og:description', content='ブラウザで簡単にお絵描きができるWebサービス(仮)')
+  body
+    canvas#canvas
+      h1 お使いのブラウザは非対応です
+      h1 最新のブラウザのダウンロードをお願いします。
+    script(src="./bundle.js")
