@@ -78,6 +78,12 @@ class DrawEvents {
 }
 
 let eventStack: PointerEvent[] = []
+/**
+ *
+ *
+ * @class Tools
+ * @classdesc ドローイングに関するイベントハンドラ用関数
+ */
 class Tools {
   // ----- DOM要素 -----
   element: HTMLCanvasElement
@@ -97,21 +103,26 @@ class Tools {
   nowR: any
   p1: PointerEvent
   p2: PointerEvent
-  dist: number
+  dist: number = void 0
   // ----- PenSize用プロパティ -----
-  defRad: number
+  defRad: number = 10
   penRadius: number
-  dx: number = 0
-  dy: number = 0
-  distX: number = 0
-  distY: number = 0
-  lx: number = 0
-  ly: number = 0
+  dx: number = void 0
+  dy: number = void 0
+  distX: number = void 0
+  distY: number = void 0
+  lx: number = void 0
+  ly: number = void 0
 
+  /**
+   * Toolsクラス内で使用する要素を設定
+   * @param {HTMLCanvasElement} element
+   * @param {CanvasRenderingContext2D} [context]
+   * @memberof Tools
+   */
   constructor(element: HTMLCanvasElement, context?: CanvasRenderingContext2D) {
     this.element = element
     this.context = this.element.getContext('2d')
-    this.defRad = 10
   }
 
 
@@ -123,7 +134,7 @@ class Tools {
     //消しゴムトグル
     this.eraserToggle  ? a.globalCompositeOperation = 'destination-out'
                               : a.globalCompositeOperation = 'source-over'
-    this.defRad = 10
+
     a.lineWidth = this.activatePressure(e)
 
 
@@ -202,9 +213,9 @@ class Tools {
         eventStack[i] = e
       }
     }
-    console.log('point: ', eventStack.length)
+
     if (eventStack.length > 3) {
-      eventStack.splice(0, 3)
+      eventStack.splice( 0, 3 )
     }
 
     this.p1 = eventStack[0]
@@ -227,7 +238,6 @@ class Tools {
 
       this.distX = Math.abs(this.lx - this.dx)
       this.distY = Math.abs(this.ly - this.dy)
-      console.log(this.distX, this.distY)
 
       this.dist = Math.abs(this.p1.pageX - this.p2.pageX) + Math.abs(this.p1.pageY - this.p2.pageY)
       this.nowR = this.dist / this.pinchHandler
@@ -238,10 +248,11 @@ class Tools {
   private puressurePoints(e: PointerEvent) {
     return { x: e.offsetX, y: e.offsetY, pressure: Math.sin(e.pressure) }
   }
+
   private removeEventStack(e: PointerEvent) {
     for (let i = 0; i < eventStack.length; i++) {
       if (eventStack[i].pointerId == e.pointerId) {
-        eventStack.splice(i, 1)
+        eventStack.splice( i, 1 )
       }
     }
   }
@@ -292,9 +303,9 @@ class Tools {
     style.top = this.distY + 'px'
     style.transform = scale
     style.webkitTransform = scale
-    this.p1 = null
-    this.p2 = null
-    this.dist = null
+    this.p1 = void 0
+    this.p2 = void 0
+    this.dist = 0
   }
   public getNowR() {
     return this.nowR
