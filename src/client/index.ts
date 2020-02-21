@@ -1,9 +1,13 @@
-class Application {
+interface Canvas {
   canvas: HTMLCanvasElement;
-  ctx: any;
+  context: CanvasRenderingContext2D | any;
+}
+
+class Application implements Canvas {
+  canvas: HTMLCanvasElement;
+  context: CanvasRenderingContext2D | any;
   width: number;
   height: number;
-  fps: number;
   rect: ClientRect;
   constructor(
     canvas: HTMLCanvasElement,
@@ -14,7 +18,7 @@ class Application {
     this.width = width;
     this.height = height;
     this.canvas = canvas;
-    this.ctx = context;
+    this.context = context;
     this.rect = this.canvas.getBoundingClientRect();
   }
   public init(
@@ -36,28 +40,21 @@ class Application {
     if (this.width || this.height) {
       this.canvas.width = this.width;
       this.canvas.height = this.height;
-      this.ctx.width = this.width;
-      this.ctx.height = this.height;
+      this.context.width = this.width;
+      this.context.height = this.height;
     }
   }
   public clearAll() {
-    this.ctx.clearRect(0, 0, this.width, this.height);
-    this.ctx.beginPath();
-  }
-  public clearInterval(fps: number) {
-    this.fps = fps;
+    this.context.clearRect(0, 0, this.width, this.height);
+    this.context.beginPath();
   }
   private backgroundColor(color: string) {
-    this.ctx.fillStyle = color;
-    this.ctx.fillRect(0, 0, this.width, this.height);
+    this.context.fillStyle = color;
+    this.context.fillRect(0, 0, this.width, this.height);
   }
   private hideMenuHandler(bool: boolean) {
-    document.addEventListener("contextmenu", () => {
-      bool;
-    });
-    document.addEventListener("MSHoldVisal", () => {
-      bool;
-    });
+    document.addEventListener("contextmenu", () => bool);
+    document.addEventListener("MSHoldVisal", () => bool);
   }
   private _isImageSmoothing(context: CanvasRenderingContext2D, bool: boolean) {
     context.imageSmoothingEnabled = bool;
@@ -157,27 +154,28 @@ class Tools {
     }
   }
   public movePointerHandler(event: PointerEvent) {
-		this.pointerSwitcher(
-			event,{
-			'pen': this.handlePenMove(event),
-			'touch': this.handleTouchMove(event),
-			'mouse': this.handleMouseMove(event)
-			}
-		)
-	}
-	public pointerSwitcher(event: PointerEvent, functionObject: {pen: void, touch: void, mouse: void}){
+    this.pointerSwitcher(event, {
+      pen: this.handlePenMove(event),
+      touch: this.handleTouchMove(event),
+      mouse: this.handleMouseMove(event)
+    });
+  }
+  public pointerSwitcher(
+    event: PointerEvent,
+    functionObject: { pen: void; touch: void; mouse: void }
+  ) {
     switch (event.pointerType) {
       case "pen":
-				functionObject.pen
+        functionObject.pen;
         break;
       case "touch":
-				functionObject.touch
+        functionObject.touch;
         break;
       case "mouse":
-				functionObject.mouse
+        functionObject.mouse;
         break;
     }
-	}
+  }
   public upPointerHandler(event: PointerEvent) {
     this.drawToggle = false;
     //@ts-ignore
