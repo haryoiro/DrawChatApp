@@ -12,14 +12,14 @@ module.exports = [{
 
   // エントリーポイントの設定（メインとなるJavaScriptファイル）
   entry: {
-    client: "./src/client/index.ts"
+    index: "./src/client/index.ts"
   },
   // 出力設定
   output: {
     publicPath: "/",
-    filename: `bundle.js`,
+    filename: `[name].js`,
     // expressでpublicフォルダ直下を静的に読み込むように設定するので、そこへ出力
-    path: `${__dirname}/public`
+    path: `${__dirname}/public/js`
   },
   module: {
     rules: [{
@@ -41,7 +41,8 @@ module.exports = [{
   plugins: [
     new HtmlWebpackPlugin({
       template:  path.join(__dirname, 'src/client/view/index.pug'),
-      filename: "index.html"
+      filename: "../html/index.html",
+      path: `${__dirname}/public`
     })
   ]
 }, {
@@ -50,11 +51,11 @@ module.exports = [{
   // development -> ソースマップ有効
   // production  -> 最適化有効
   mode: "development",
-  
+
   // エントリーポイントの設定（メインとなるJavaScriptファイル）
   entry: {
     server: "./src/server/index.ts"
-  },  
+  },
   // 出力設定
   output: {
     publicPath: "/",

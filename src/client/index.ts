@@ -75,24 +75,24 @@ class Tools {
   pressureToggle: boolean;
   // ----- Pinch/Zoom用プロパティ -----
   pinchDist: number;
-  baseX: number;
-  baseY: number;
+  basePoint:PointerEvent;
   nowX: number;
   nowY: number;
-  nowR: number;
-  p1: PointerEvent;
-  p2: PointerEvent;
+  nowR: number;   // 現在の拡大率
+  nowScale: number;
+  p1: PointerEvent; // 最初に触れた指
+  p2: PointerEvent; // 次に触れた指
   dist: number;
   // ----- PenSize用プロパティ -----
   defRad: number = 10;
   penRadius: number;
   dx: number = void 0;
   dy: number = void 0;
-  distX: number = void 0;
-  distY: number = void 0;
+  distX: number // 横からの距離
+  distY: number // 上からの距離
   lx: number = void 0;
   ly: number = void 0;
-  capStyle: any;
+  capStyle: string = "round"
 
   constructor(element: HTMLCanvasElement, context?: CanvasRenderingContext2D) {
     this.element = element;
@@ -143,8 +143,7 @@ class Tools {
     eventStack.push(event);
 
     if (eventStack.length <= 1) {
-      this.baseX = eventStack[0].pageX;
-      this.baseY = eventStack[0].pageY;
+      this.basePoint = eventStack[0]
     } else if (eventStack.length >= 2) {
       this.p1 = eventStack[0];
       this.p2 = eventStack[1];
@@ -246,10 +245,10 @@ class Tools {
 
       this.dist =
         Math.abs(this.p1.pageX - this.p2.pageX) +
-        Math.abs(this.p1.pageY - this.p2.pageY);
-      this.nowR = this.dist / this.pinchDist;
+        Math.abs(this.p1.pageY - this.p2.pageY) 
+      this.nowScale = this.dist / this.pinchDist;
     }
-    this._pinchHandle();
+    this._pinchHandle(this.nowR);
   }
 
   // ---- PencilTools ----
@@ -259,15 +258,12 @@ class Tools {
     //@ts-ignore
     let a: any = this.context;
     //消しゴムトグル
-    this.eraserToggle
-      ? (a.globalCompositeOperation = "destination-out")
-      : (a.globalCompositeOperation = "source-over");
+    this.eraseTool(a)
 
-    a.strokeStyle = this.canvasColor;
-    a.fillStyle = this.canvasColor;
-    a.lineCap = "round";
+    this.settingPenConf(a, this.canvasColor, this.capStyle);
     this.drawLine(a, event);
   }
+
   // ペン用PencilTool
   public penPencilTool(event: PointerEvent) {
     //Context2D初期化
@@ -276,14 +272,14 @@ class Tools {
     //消しゴムトグル
     this.eraseTool(a);
     a.lineWidth = this._activatePressure(event);
-    this.settingPenConf(a);
+    this.settingPenConf(a, this.canvasColor, this.capStyle);
     this.drawLine(a, event);
   }
 
-  private settingPenConf(a: any) {
-    a.strokeStyle = this.canvasColor;
-    a.fillStyle = this.canvasColor;
-    a.lineCap = this.capStyle;
+  private settingPenConf(context: any, color: string | number, capStyle: string) {
+    context.strokeStyle = color
+    context.fillStyle = color
+    context.lineCap = capStyle
   }
 
   // タッチ用PencilTool
@@ -294,7 +290,7 @@ class Tools {
     //消しゴムトグル
     this.eraseTool(a);
     a.lineWidth = this.penRadius;
-    this.settingPenConf(a);
+    this.settingPenConf(a, this.canvasColor, this.capStyle);
 
     this.drawLine(a, event);
   }
@@ -340,9 +336,9 @@ class Tools {
     }
   }
   // ピンチズーム処理
-  private _pinchHandle() {
+  private _pinchHandle(nowScalse: number) {
     let style = document.getElementById("canvas").style;
-    let scale = `scale(${this.nowR},${this.nowR})`;
+    let scale = `scale(${nowScalse},${nowScalse})`;
     style.left = this.distX + "px";
     style.top = this.distY + "px";
     style.transform = scale;
