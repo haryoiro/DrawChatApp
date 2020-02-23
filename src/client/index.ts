@@ -316,8 +316,8 @@ class Tools {
     return this.nowR;
   }
   private _calclationPointsDistance(p1x: number, p1y: number, p2x: number, p2y: number){
-    let X = Math.abs(p1x) - Math.abs(p2x)
-    let Y = Math.abs(p1y) - Math.abs(p2y)
+    let X = p1x - p2x
+    let Y = p1y - p2y
     return Math.sqrt(X*X+Y*Y)/2
   }
 
