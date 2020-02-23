@@ -83,11 +83,12 @@ class Tools {
   p1: PointerEvent; // 最初に触れた指
   p2: PointerEvent; // 次に触れた指
   dist: number;
+  private zoomInvrease: number = 1
   // ----- PenSize用プロパティ -----
   defRad: number = 10;
   penRadius: number;
-  dx: number = void 0;
-  dy: number = void 0;
+  dx: number = 0
+  dy: number = 0
   distX: number // 横からの距離
   distY: number // 上からの距離
   lx: number = void 0;
@@ -101,40 +102,15 @@ class Tools {
   }
   public eventActivation() {
     if (this._supportPointerEvent) {
-      document.addEventListener(
-        "pointerdown",
-        event => this.downPointerHandler(event),
-        { passive: false }
-      );
-      document.addEventListener(
-        "pointerup",
-        event => this.upPointerHandler(event),
-        { passive: false }
-      );
-      document.addEventListener(
-        "pointermove",
-        event => this.movePointerHandler(event),
-        { passive: false }
-      );
-      document.addEventListener(
-        "pointerleave",
-        event => this.leavePointerHandler(event),
-        { passive: false }
-      );
+      document.addEventListener("pointerdown",event => this.downPointerHandler(event),{ passive: false });
+      document.addEventListener("pointerup",event => this.upPointerHandler(event),{ passive: false });
+      document.addEventListener("pointermove",event => this.movePointerHandler(event),{ passive: false });
+      document.addEventListener("pointerleave",event => this.leavePointerHandler(event),{ passive: false });
     } else {
-      document.addEventListener("pointerdown", event =>
-        this.downMouseHandler(event)
-      );
-      document.addEventListener("pointerup", event =>
-        this.upMouseHandler(event)
-      );
-      document.addEventListener("pointermove", event =>
-        this.moveMouseHandler(event)
-      );
-      document.addEventListener("pointerleave", event =>
-        this.leaveMouseHandler(event)
-      );
-    }
+      document.addEventListener("pointerdown", event =>this.downMouseHandler(event));
+      document.addEventListener("pointerup", event =>this.upMouseHandler(event));
+      document.addEventListener("pointermove", event =>this.moveMouseHandler(event));
+      document.addEventListener("pointerleave", event =>this.leaveMouseHandler(event))}
   }
   // ---- PointerEvents ----
   public downPointerHandler(event: PointerEvent) {
@@ -143,13 +119,14 @@ class Tools {
     eventStack.push(event);
 
     if (eventStack.length <= 1) {
-      this.basePoint = eventStack[0]
+      this.p1 = eventStack[0];
     } else if (eventStack.length >= 2) {
       this.p1 = eventStack[0];
       this.p2 = eventStack[1];
-      this.pinchDist =
-        Math.abs(this.p1.pageX - this.p2.pageX) +
-        Math.abs(this.p1.pageY - this.p2.pageY);
+      this.pinchDist = this._calclationPointsDistance(this.p1.pageX, this.p1.pageY, this.p2.pageX, this.p2.pageY)
+      this.nowR = this.dist / this.pinchDist
+      console.log('down: '+this.nowR)
+
     }
   }
   public movePointerHandler(event: PointerEvent) {
@@ -180,6 +157,7 @@ class Tools {
     //@ts-ignore
     this.context.beginPath();
     this._removeEventStack(event);
+    console.log('up: '+this.nowR)
   }
   public leavePointerHandler(event: PointerEvent) {
     this.drawToggle = false;
@@ -205,15 +183,11 @@ class Tools {
   //  ペン用moveHandler
   public handlePenMove(event: PointerEvent) {
     event.preventDefault();
-    if (this.drawToggle) {
-      this.penPencilTool(event);
-    }
+    if (this.drawToggle) {this.penPencilTool(event);}
   }
   // マウス用moveHandler
   public handleMouseMove(event: PointerEvent | MouseEvent) {
-    if (this.drawToggle) {
-      this.mousePencilTool(event);
-    }
+    if (this.drawToggle) {this.mousePencilTool(event);}
   }
   // タッチ用moveHandler
   public handleTouchMove(event: PointerEvent) {
@@ -224,31 +198,25 @@ class Tools {
       }
     }
 
+
     if (eventStack.length > 3) {
       eventStack.splice(0, 3);
     }
     this.p1 = eventStack[0];
     this.p2 = eventStack[1];
-    if (this.drawToggle) {
-      this.touchPencilTool(eventStack[0]);
-    }
+    if (this.drawToggle) {this.touchPencilTool(eventStack[0])}
 
     if (eventStack.length >= 2) {
       this.drawToggle = false;
-      this.lx = this.lx;
-      this.ly = this.ly;
       this.dx = (this.p1.pageX + this.p2.pageX) / 2;
       this.dy = (this.p1.pageY + this.p2.pageY) / 2;
+      console.log('dx:'+this.dx+'dy'+this.dy)
 
-      this.distX = Math.abs(this.lx - this.dx);
-      this.distY = Math.abs(this.ly - this.dy);
-
-      this.dist =
-        Math.abs(this.p1.pageX - this.p2.pageX) +
-        Math.abs(this.p1.pageY - this.p2.pageY) 
-      this.nowScale = this.dist / this.pinchDist;
+      this.dist = this._calclationPointsDistance(this.p1.pageX, this.p1.pageY, this.p2.pageX, this.p2.pageY)
+      this.nowR = this.dist / this.pinchDist
+      console.log('nowR:'+this.nowR)
     }
-    this._pinchHandle(this.nowR);
+    this._pinchHandle(this.dist / this.pinchDist);
   }
 
   // ---- PencilTools ----
@@ -314,6 +282,11 @@ class Tools {
   public getNowR() {
     return this.nowR;
   }
+  private _calclationPointsDistance(p1x: number, p1y: number, p2x: number, p2y: number){
+    let X = Math.abs(p1x) - Math.abs(p2x)
+    let Y = Math.abs(p1y) - Math.abs(p2y)
+    return Math.sqrt(X*X+Y*Y)/2
+  }
 
   // 筆圧に対応していた場合値を返す
   private _activatePressure(event: PointerEvent) {
@@ -324,7 +297,7 @@ class Tools {
     } else if (event.pressure <= 0.05 || event.pressure > 0.01) {
       return 0.05;
     } else {
-      return void 0;
+      return;
     }
   }
   //タッチイベントをスタックから削除
@@ -338,7 +311,8 @@ class Tools {
   // ピンチズーム処理
   private _pinchHandle(nowScalse: number) {
     let style = document.getElementById("canvas").style;
-    let scale = `scale(${nowScalse},${nowScalse})`;
+		let scale = `scale(${this.nowR},${this.nowR})`;
+		console.log(this.nowR + ':' + this.nowScale)
     style.left = this.distX + "px";
     style.top = this.distY + "px";
     style.transform = scale;
