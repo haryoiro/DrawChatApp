@@ -15,7 +15,6 @@ class Application implements Canvas {
   public setUpView(
     width: number,
     height: number,
-    context: CanvasRenderingContext2D,
     color: string,
     hide: boolean,
     smooth = false,
