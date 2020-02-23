@@ -93,6 +93,7 @@ class Tools {
   lx: number = void 0;
   ly: number = void 0;
   capStyle: string = "round"
+  joinStyle: string = "round"
 
   constructor(element: HTMLCanvasElement, context?: CanvasRenderingContext2D) {
     this.element = element;
@@ -111,12 +112,53 @@ class Tools {
       document.addEventListener("pointermove", event =>this.moveMouseHandler(event));
       document.addEventListener("pointerleave", event =>this.leaveMouseHandler(event))}
   }
-  // ---- PointerEvents ----
-  public downPointerHandler(event: PointerEvent) {
+  public pointerSwitcher(
+    event: PointerEvent,
+    functionObject: { pen: void; touch: void; mouse: void }
+    ) {
+      switch (event.pointerType) {
+        case "pen":
+          functionObject.pen;
+          break;
+        case "touch":
+          functionObject.touch;
+          break;
+        case "mouse":
+          functionObject.mouse;
+          break;
+    }
+  }
+  // ---- PointerEvents ---
+  // !------ Switcher ------
+  // *- Main Callback Functions -
+  public downPointerHandler(event: PointerEvent): void  {
+    this.pointerSwitcher(event, {
+      pen: this.handlePenDown(event),
+      touch: this.handleTouchDown(event),
+      mouse: this.handleMouseDown(event)
+    })
+  }
+  public movePointerHandler(event: PointerEvent): void  {
+    this.pointerSwitcher(event, {
+      pen: this.handlePenMove(event),
+      touch: this.handleTouchMove(event),
+      mouse: this.handleMouseMove(event)
+    });
+  }
+  public upPointerHandler(event: PointerEvent): void  {
+    this.pointerSwitcher(event, {
+      pen: this.handlePenUp(event),
+      touch: this.handleTouchUp(event),
+      mouse: this.handleMouseUp(event)
+    })
+  }
+  // ---- PointerEvents ---
+  // *------- DOWN -------
+  private handlePenDown(event: PointerEvent): void {
     event.preventDefault();
     this.drawToggle = true;
-    eventStack.push(event);
-
+  }
+  private handleTouchDown(event: PointerEvent): void {
     if (eventStack.length <= 1) {
       this.p1 = eventStack[0];
     } else if (eventStack.length >= 2) {
@@ -124,70 +166,22 @@ class Tools {
       this.p2 = eventStack[1];
       this.pinchDist = this._calclationPointsDistance(this.p1.pageX, this.p1.pageY, this.p2.pageX, this.p2.pageY)
       this.nowR = this.dist / this.pinchDist
-
     }
   }
-  public movePointerHandler(event: PointerEvent) {
-    this.pointerSwitcher(event, {
-      pen: this.handlePenMove(event),
-      touch: this.handleTouchMove(event),
-      mouse: this.handleMouseMove(event)
-    });
-  }
-  public pointerSwitcher(
-    event: PointerEvent,
-    functionObject: { pen: void; touch: void; mouse: void }
-  ) {
-    switch (event.pointerType) {
-      case "pen":
-        functionObject.pen;
-        break;
-      case "touch":
-        functionObject.touch;
-        break;
-      case "mouse":
-        functionObject.mouse;
-        break;
-    }
-  }
-  public upPointerHandler(event: PointerEvent) {
-    this.drawToggle = false;
-    //@ts-ignore
-    this.context.beginPath();
-    this._removeEventStack(event);
-  }
-  public leavePointerHandler(event: PointerEvent) {
-    this.drawToggle = false;
-  }
-
-  // ---- MouseEvents ----
-  public downMouseHandler(event: MouseEvent) {
+  private handleMouseDown(event:  PointerEvent): void {
     this.drawToggle = true;
   }
-  public moveMouseHandler(event: MouseEvent) {
-    this.handleMouseMove(event);
-  }
-  public upMouseHandler(event: MouseEvent) {
-    this.drawToggle = false;
-    //@ts-ignore
-    this.context.beginPath();
-  }
-  public leaveMouseHandler(event: MouseEvent) {
-    this.drawToggle = false;
-  }
 
-  // ----- moveHandler分岐処理 -----
-  //  ペン用moveHandler
-  public handlePenMove(event: PointerEvent) {
+  // ---- PointerEvents ---
+  // *------- MOVE -------
+  public handlePenMove(event: PointerEvent): void  {
     event.preventDefault();
     if (this.drawToggle) {this.penPencilTool(event);}
   }
-  // マウス用moveHandler
-  public handleMouseMove(event: PointerEvent | MouseEvent) {
+  public handleMouseMove(event: PointerEvent | MouseEvent): void  {
     if (this.drawToggle) {this.mousePencilTool(event);}
   }
-  // タッチ用moveHandler
-  public handleTouchMove(event: PointerEvent) {
+  public handleTouchMove(event: PointerEvent): void  {
     event.preventDefault();
     for (let i = 0; i < eventStack.length; i++) {
       if (eventStack[i].pointerId == event.pointerId) {
@@ -214,6 +208,49 @@ class Tools {
     this._pinchHandle(this.dist / this.pinchDist);
   }
 
+  // ---- PointerEvents ---
+  // *--------  UP  --------
+  private handlePenUp(event: PointerEvent): void {
+    this.drawToggle = false;
+    //@ts-ignore
+    this.context.beginPath();
+  }
+  private handleTouchUp(event: PointerEvent): void {
+    this.drawToggle = false;
+    //@ts-ignore
+    this.context.beginPath();
+    this._removeEventStack(event);
+  }
+  private handleMouseUp(event: PointerEvent): void {
+    this.drawToggle = false;
+    //@ts-ignore
+    this.context.beginPath();
+  }
+
+  // ---- PointerEvents ---
+  // *------- LEAVE -------
+  public leavePointerHandler(event: PointerEvent): void  {
+    this.drawToggle = false;
+  }
+
+  // ---- MouseEvents ----
+  // *-- LEGACY EVENTS --
+  public downMouseHandler(event: MouseEvent): void  {
+    this.drawToggle = true;
+  }
+  public moveMouseHandler(event: MouseEvent): void  {
+    this.handleMouseMove(event);
+  }
+  public upMouseHandler(event: MouseEvent): void  {
+    this.drawToggle = false;
+    //@ts-ignore
+    this.context.beginPath();
+  }
+  public leaveMouseHandler(event: MouseEvent): void  {
+    this.drawToggle = false;
+  }
+
+
   // ---- PencilTools ----
   // マウス用PencilTool
   public mousePencilTool(event: MouseEvent | PointerEvent) {
@@ -223,7 +260,7 @@ class Tools {
     //消しゴムトグル
     this.eraseTool(a)
 
-    this.settingPenConf(a, this.canvasColor, this.capStyle);
+    this.settingPenConf(a, this.canvasColor, this.capStyle, this.joinStyle);
     this.drawLine(a, event);
   }
 
@@ -235,14 +272,15 @@ class Tools {
     //消しゴムトグル
     this.eraseTool(a);
     a.lineWidth = this._activatePressure(event);
-    this.settingPenConf(a, this.canvasColor, this.capStyle);
+    this.settingPenConf(a, this.canvasColor, this.capStyle, this.joinStyle);
     this.drawLine(a, event);
   }
 
-  private settingPenConf(context: any, color: string | number, capStyle: string) {
+  private settingPenConf(context: any, color: string | number, capStyle: string, JoinStyle: string) {
     context.strokeStyle = color
     context.fillStyle = color
     context.lineCap = capStyle
+    context.lineJoin = JoinStyle
   }
 
   // タッチ用PencilTool
@@ -253,7 +291,7 @@ class Tools {
     //消しゴムトグル
     this.eraseTool(a);
     a.lineWidth = this.penRadius;
-    this.settingPenConf(a, this.canvasColor, this.capStyle);
+    this.settingPenConf(a, this.canvasColor, this.capStyle, this.joinStyle);
 
     this.drawLine(a, event);
   }
