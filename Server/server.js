@@ -91,9 +91,20 @@
   !*** ./src/server/index.ts ***!
   \*****************************/
 /*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+eval("var express = __webpack_require__(/*! express */ \"express\");\r\nvar exApp = express();\r\nvar exPort = \"development\" || false;\r\nexApp.get('/', function (req, res) {\r\n    res.send('hello');\r\n});\r\nexApp.listen(exPort, function () {\r\n    console.log(\"server started at  http://localhost:\" + exPort);\r\n});\r\n\n\n//# sourceURL=webpack:///./src/server/index.ts?");
+
+/***/ }),
+
+/***/ "express":
+/*!**************************!*\
+  !*** external "express" ***!
+  \**************************/
+/*! no static exports found */
 /***/ (function(module, exports) {
 
-eval("\n\n//# sourceURL=webpack:///./src/server/index.ts?");
+eval("module.exports = require(\"express\");\n\n//# sourceURL=webpack:///external_%22express%22?");
 
 /***/ })
 

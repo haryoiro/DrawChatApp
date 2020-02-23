@@ -93,8 +93,360 @@
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-eval("var Application = /** @class */ (function () {\r\n    function Application(canvas, context) {\r\n        this.canvas = canvas;\r\n        this.context = context;\r\n    }\r\n    Application.prototype.setUpView = function (width, height, context, color, hide, smooth) {\r\n        if (smooth === void 0) { smooth = false; }\r\n        this._settingCanvasSize(width, height);\r\n        this._backgroundColor(color);\r\n        this._hideMenuHandler(hide);\r\n        this._isImageSmoothing(context, smooth);\r\n    };\r\n    Application.prototype._settingCanvasSize = function (width, height) {\r\n        this.canvas.width = width;\r\n        this.canvas.height = height;\r\n        this.context.width = width;\r\n        this.context.height = height;\r\n    };\r\n    Application.prototype.clearAll = function () {\r\n        this.context.clearRect(0, 0, this.width, this.height);\r\n        this.context.beginPath();\r\n    };\r\n    Application.prototype._backgroundColor = function (color) {\r\n        this.context.fillStyle = color;\r\n        this.context.fillRect(0, 0, this.width, this.height);\r\n    };\r\n    Application.prototype._hideMenuHandler = function (bool) {\r\n        document.addEventListener(\"contextmenu\", function () { return bool; });\r\n        document.addEventListener(\"MSHoldVisal\", function () { return bool; });\r\n    };\r\n    Application.prototype._isImageSmoothing = function (context, bool) {\r\n        context.imageSmoothingEnabled = bool;\r\n    };\r\n    Object.defineProperty(Application.prototype, \"width\", {\r\n        // *getter/setter Method\r\n        get: function () {\r\n            return this._width;\r\n        },\r\n        set: function (value) {\r\n            this._width = value;\r\n        },\r\n        enumerable: true,\r\n        configurable: true\r\n    });\r\n    Object.defineProperty(Application.prototype, \"height\", {\r\n        get: function () {\r\n            return this._height;\r\n        },\r\n        set: function (value) {\r\n            this._height = value;\r\n        },\r\n        enumerable: true,\r\n        configurable: true\r\n    });\r\n    return Application;\r\n}());\r\nvar eventStack = [];\r\nvar Tools = /** @class */ (function () {\r\n    function Tools(element, context) {\r\n        // ----- ツール関連プロパティ\r\n        this.canvasColor = \"#000\";\r\n        this.zoomInvrease = 1;\r\n        // ----- PenSize用プロパティ -----\r\n        this.defRad = 10;\r\n        this.dx = 0;\r\n        this.dy = 0;\r\n        this.lx = void 0;\r\n        this.ly = void 0;\r\n        this.capStyle = \"round\";\r\n        this.element = element;\r\n        this.context = context;\r\n        this.eventActivation();\r\n    }\r\n    Tools.prototype.eventActivation = function () {\r\n        var _this = this;\r\n        if (this._supportPointerEvent) {\r\n            document.addEventListener(\"pointerdown\", function (event) { return _this.downPointerHandler(event); }, { passive: false });\r\n            document.addEventListener(\"pointerup\", function (event) { return _this.upPointerHandler(event); }, { passive: false });\r\n            document.addEventListener(\"pointermove\", function (event) { return _this.movePointerHandler(event); }, { passive: false });\r\n            document.addEventListener(\"pointerleave\", function (event) { return _this.leavePointerHandler(event); }, { passive: false });\r\n        }\r\n        else {\r\n            document.addEventListener(\"pointerdown\", function (event) { return _this.downMouseHandler(event); });\r\n            document.addEventListener(\"pointerup\", function (event) { return _this.upMouseHandler(event); });\r\n            document.addEventListener(\"pointermove\", function (event) { return _this.moveMouseHandler(event); });\r\n            document.addEventListener(\"pointerleave\", function (event) { return _this.leaveMouseHandler(event); });\r\n        }\r\n    };\r\n    // ---- PointerEvents ----\r\n    Tools.prototype.downPointerHandler = function (event) {\r\n        event.preventDefault();\r\n        this.drawToggle = true;\r\n        eventStack.push(event);\r\n        if (eventStack.length <= 1) {\r\n            this.p1 = eventStack[0];\r\n        }\r\n        else if (eventStack.length >= 2) {\r\n            this.p1 = eventStack[0];\r\n            this.p2 = eventStack[1];\r\n            this.pinchDist = this._calclationPointsDistance(this.p1.pageX, this.p1.pageY, this.p2.pageX, this.p2.pageY);\r\n            this.nowR = this.dist / this.pinchDist;\r\n        }\r\n    };\r\n    Tools.prototype.movePointerHandler = function (event) {\r\n        this.pointerSwitcher(event, {\r\n            pen: this.handlePenMove(event),\r\n            touch: this.handleTouchMove(event),\r\n            mouse: this.handleMouseMove(event)\r\n        });\r\n    };\r\n    Tools.prototype.pointerSwitcher = function (event, functionObject) {\r\n        switch (event.pointerType) {\r\n            case \"pen\":\r\n                functionObject.pen;\r\n                break;\r\n            case \"touch\":\r\n                functionObject.touch;\r\n                break;\r\n            case \"mouse\":\r\n                functionObject.mouse;\r\n                break;\r\n        }\r\n    };\r\n    Tools.prototype.upPointerHandler = function (event) {\r\n        this.drawToggle = false;\r\n        //@ts-ignore\r\n        this.context.beginPath();\r\n        this._removeEventStack(event);\r\n    };\r\n    Tools.prototype.leavePointerHandler = function (event) {\r\n        this.drawToggle = false;\r\n    };\r\n    // ---- MouseEvents ----\r\n    Tools.prototype.downMouseHandler = function (event) {\r\n        this.drawToggle = true;\r\n    };\r\n    Tools.prototype.moveMouseHandler = function (event) {\r\n        this.handleMouseMove(event);\r\n    };\r\n    Tools.prototype.upMouseHandler = function (event) {\r\n        this.drawToggle = false;\r\n        //@ts-ignore\r\n        this.context.beginPath();\r\n    };\r\n    Tools.prototype.leaveMouseHandler = function (event) {\r\n        this.drawToggle = false;\r\n    };\r\n    // ----- moveHandler分岐処理 -----\r\n    //  ペン用moveHandler\r\n    Tools.prototype.handlePenMove = function (event) {\r\n        event.preventDefault();\r\n        if (this.drawToggle) {\r\n            this.penPencilTool(event);\r\n        }\r\n    };\r\n    // マウス用moveHandler\r\n    Tools.prototype.handleMouseMove = function (event) {\r\n        if (this.drawToggle) {\r\n            this.mousePencilTool(event);\r\n        }\r\n    };\r\n    // タッチ用moveHandler\r\n    Tools.prototype.handleTouchMove = function (event) {\r\n        event.preventDefault();\r\n        for (var i = 0; i < eventStack.length; i++) {\r\n            if (eventStack[i].pointerId == event.pointerId) {\r\n                eventStack[i] = event;\r\n            }\r\n        }\r\n        if (eventStack.length > 3) {\r\n            eventStack.splice(0, 3);\r\n        }\r\n        this.p1 = eventStack[0];\r\n        this.p2 = eventStack[1];\r\n        if (this.drawToggle) {\r\n            this.touchPencilTool(eventStack[0]);\r\n        }\r\n        if (eventStack.length >= 2) {\r\n            this.drawToggle = false;\r\n            this.dx = (this.p1.pageX + this.p2.pageX) / 2;\r\n            this.dy = (this.p1.pageY + this.p2.pageY) / 2;\r\n            this.dist = this._calclationPointsDistance(this.p1.pageX, this.p1.pageY, this.p2.pageX, this.p2.pageY);\r\n            this.nowR = this.dist / this.pinchDist;\r\n        }\r\n        this._pinchHandle(this.dist / this.pinchDist);\r\n    };\r\n    // ---- PencilTools ----\r\n    // マウス用PencilTool\r\n    Tools.prototype.mousePencilTool = function (event) {\r\n        //Context2D初期化\r\n        //@ts-ignore\r\n        var a = this.context;\r\n        //消しゴムトグル\r\n        this.eraseTool(a);\r\n        this.settingPenConf(a, this.canvasColor, this.capStyle);\r\n        this.drawLine(a, event);\r\n    };\r\n    // ペン用PencilTool\r\n    Tools.prototype.penPencilTool = function (event) {\r\n        //Context2D初期化\r\n        //@ts-ignore\r\n        var a = this.context;\r\n        //消しゴムトグル\r\n        this.eraseTool(a);\r\n        a.lineWidth = this._activatePressure(event);\r\n        this.settingPenConf(a, this.canvasColor, this.capStyle);\r\n        this.drawLine(a, event);\r\n    };\r\n    Tools.prototype.settingPenConf = function (context, color, capStyle) {\r\n        context.strokeStyle = color;\r\n        context.fillStyle = color;\r\n        context.lineCap = capStyle;\r\n    };\r\n    // タッチ用PencilTool\r\n    Tools.prototype.touchPencilTool = function (event) {\r\n        //Context2D初期化\r\n        //@ts-ignore\r\n        var a = this.context;\r\n        //消しゴムトグル\r\n        this.eraseTool(a);\r\n        a.lineWidth = this.penRadius;\r\n        this.settingPenConf(a, this.canvasColor, this.capStyle);\r\n        this.drawLine(a, event);\r\n    };\r\n    Tools.prototype.drawLine = function (a, event) {\r\n        a.lineTo(event.offsetX, event.offsetY);\r\n        a.stroke();\r\n        a.beginPath();\r\n        a.moveTo(event.offsetX, event.offsetY);\r\n    };\r\n    Tools.prototype.eraseTool = function (a) {\r\n        this.eraserToggle\r\n            ? (a.globalCompositeOperation = \"destination-out\")\r\n            : (a.globalCompositeOperation = \"source-over\");\r\n    };\r\n    Tools.prototype.setPencilColor = function (color) {\r\n        this.canvasColor = color;\r\n    };\r\n    Tools.prototype.getNowR = function () {\r\n        return this.nowR;\r\n    };\r\n    Tools.prototype._calclationPointsDistance = function (p1x, p1y, p2x, p2y) {\r\n        var X = Math.abs(p1x) - Math.abs(p2x);\r\n        var Y = Math.abs(p1y) - Math.abs(p2y);\r\n        return Math.sqrt(X * X + Y * Y) / 2;\r\n    };\r\n    // 筆圧に対応していた場合値を返す\r\n    Tools.prototype._activatePressure = function (event) {\r\n        var Rad = this.defRad;\r\n        if (event.pressure < 0.995 || event.pressure > 0.05) {\r\n            event.pressure ? (Rad *= event.pressure) : (Rad /= event.pressure);\r\n            return Rad;\r\n        }\r\n        else if (event.pressure <= 0.05 || event.pressure > 0.01) {\r\n            return 0.05;\r\n        }\r\n        else {\r\n            return;\r\n        }\r\n    };\r\n    //タッチイベントをスタックから削除\r\n    Tools.prototype._removeEventStack = function (event) {\r\n        for (var i = 0; i < eventStack.length; i++) {\r\n            if (eventStack[i].pointerId == event.pointerId) {\r\n                eventStack.splice(i, 1);\r\n            }\r\n        }\r\n    };\r\n    // ピンチズーム処理\r\n    Tools.prototype._pinchHandle = function (nowScalse) {\r\n        var style = document.getElementById(\"canvas\").style;\r\n        var scale = \"scale(\" + this.nowR + \",\" + this.nowR + \")\";\r\n        console.log(this.nowR + ':' + this.nowScale);\r\n        style.left = this.distX + \"px\";\r\n        style.top = this.distY + \"px\";\r\n        style.transform = scale;\r\n        style.webkitTransform = scale;\r\n    };\r\n    Tools.prototype._supportPointerEvent = function () {\r\n        return window.PointerEvent ? true : false;\r\n    };\r\n    Tools.prototype._puressurePoints = function (event) {\r\n        return {\r\n            x: event.offsetX,\r\n            y: event.offsetY,\r\n            pressurevent: Math.sin(event.pressure)\r\n        };\r\n    };\r\n    // ----- 画面上にデバッグ情報が流れる\r\n    Tools.prototype._debugLogger = function (message) {\r\n        if (document.getElementById(\"debug\")) {\r\n            document\r\n                .getElementById(\"debug\")\r\n                .insertAdjacentHTML(\"afterbegin\", message + \"<br>\");\r\n        }\r\n        else {\r\n            var el = document.createElement(\"div\");\r\n            el.id = \"debug\";\r\n            el.insertAdjacentHTML(\"afterbegin\", message + \"<br>\");\r\n        }\r\n    };\r\n    return Tools;\r\n}());\r\nvar graph = document.querySelector(\"#canvas\");\r\nvar c = graph.getContext(\"2d\");\r\nvar app = new Application(graph, c);\r\nvar draw = new Tools(graph, c);\r\n// Application.prototype.init\r\n//    (context , backgroundColor, hideMenu, smoothRendering)\r\napp.setUpView(1920, 1080, c, \"#ffff\", true, false);\r\n\n\n//# sourceURL=webpack:///./src/client/index.ts?");
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var Application = /** @class */ (function () {
+    function Application(canvas, context) {
+        this.canvas = canvas;
+        this.context = context;
+    }
+    Application.prototype.setUpView = function (width, height, context, color, hide, smooth) {
+        if (smooth === void 0) { smooth = false; }
+        this._settingCanvasSize(width, height);
+        this._backgroundColor(color);
+        this._hideMenuHandler(hide);
+        this._isImageSmoothing(context, smooth);
+    };
+    Application.prototype._settingCanvasSize = function (width, height) {
+        this.canvas.width = width;
+        this.canvas.height = height;
+    };
+    Application.prototype.clearAll = function () {
+        this.context.clearRect(0, 0, this.width, this.height);
+        this.context.beginPath();
+    };
+    Application.prototype._backgroundColor = function (color) {
+        this.context.fillStyle = color;
+        this.context.fillRect(0, 0, this.width, this.height);
+    };
+    Application.prototype._hideMenuHandler = function (bool) {
+        document.addEventListener('contextmenu', function () { return bool; });
+        document.addEventListener('MSHoldVisal', function () { return bool; });
+    };
+    Application.prototype._isImageSmoothing = function (context, bool) {
+        context.imageSmoothingEnabled = bool;
+    };
+    Object.defineProperty(Application.prototype, "width", {
+        // *getter/setter Method
+        get: function () {
+            return this._width;
+        },
+        set: function (value) {
+            this._width = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Application.prototype, "height", {
+        get: function () {
+            return this._height;
+        },
+        set: function (value) {
+            this._height = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    return Application;
+}());
+var eventStack = [];
+var Tools = /** @class */ (function (_super) {
+    __extends(Tools, _super);
+    function Tools(element, context) {
+        var _this = _super.call(this, element, context) || this;
+        // ----- ツール関連プロパティ
+        _this.canvasColor = '#000';
+        _this.zoomInvrease = 1;
+        // ----- PenSize用プロパティ -----
+        _this.defRad = 10;
+        _this.dx = 0;
+        _this.dy = 0;
+        _this.lx = void 0;
+        _this.ly = void 0;
+        _this.capStyle = 'round';
+        _this.joinStyle = 'bevel';
+        _this.eventActivation();
+        return _this;
+    }
+    Tools.prototype.eventActivation = function () {
+        var _this = this;
+        if (this._supportPointerEvent) {
+            document.addEventListener('pointerdown', function (event) { return _this.downPointerController(event); }, {
+                passive: false,
+            });
+            document.addEventListener('pointerup', function (event) { return _this.upPointerController(event); }, {
+                passive: false,
+            });
+            document.addEventListener('pointermove', function (event) { return _this.movePointerController(event); }, {
+                passive: false,
+            });
+            document.addEventListener('pointerleave', function (event) { return _this.leavePointerHandler(event); }, {
+                passive: false,
+            });
+        }
+        else {
+            document.addEventListener('pointerdown', function (event) { return _this.downMouseHandler(event); });
+            document.addEventListener('pointerup', function (event) { return _this.upMouseHandler(event); });
+            document.addEventListener('pointermove', function (event) { return _this.moveMouseHandler(event); });
+            document.addEventListener('pointerleave', function (event) { return _this.leaveMouseHandler(event); });
+        }
+    };
+    Tools.prototype.pointerSwitcher = function (event, pen, touch, mouse) {
+        switch (event.pointerType) {
+            case 'pen':
+                pen;
+                break;
+            case 'touch':
+                touch;
+                break;
+            case 'mouse':
+                mouse;
+                break;
+        }
+    };
+    // ---- PointerEvents ---
+    // !------ Switcher ------
+    // *- Main Callback Functions -
+    Tools.prototype.downPointerController = function (event) {
+        this.pointerSwitcher(event, this.handlePenDown(event), this.handleTouchDown(event), this.handleMouseDown(event));
+    };
+    Tools.prototype.movePointerController = function (event) {
+        this.pointerSwitcher(event, this.handlePenMove(event), this.handleTouchMove(event), this.handleMouseMove(event));
+    };
+    Tools.prototype.upPointerController = function (event) {
+        this.pointerSwitcher(event, this.handlePenUp(event), this.handleTouchUp(event), this.handleMouseUp(event));
+    };
+    // ---- PointerEvents ---
+    // *------- DOWN -------
+    Tools.prototype.handlePenDown = function (event) {
+        event.preventDefault();
+        this.drawToggle = true;
+    };
+    Tools.prototype.handleTouchDown = function (event) {
+        event.preventDefault();
+        this.drawToggle = true;
+        if (eventStack.length <= 1) {
+            this.p1 = eventStack[0];
+        }
+        else if (eventStack.length >= 2) {
+            this.p1 = eventStack[0];
+            this.p2 = eventStack[1];
+            this.pinchDist = this._calclationPointsDistance(this.p1.pageX, this.p1.pageY, this.p2.pageX, this.p2.pageY);
+            this.nowR = this.dist / this.pinchDist;
+        }
+    };
+    Tools.prototype.handleMouseDown = function (event) {
+        this.drawToggle = true;
+    };
+    // ---- PointerEvents ---
+    // *------- MOVE -------
+    Tools.prototype.handlePenMove = function (event) {
+        event.preventDefault();
+        if (this.drawToggle) {
+            this.penPencilTool(event);
+        }
+    };
+    Tools.prototype.handleMouseMove = function (event) {
+        if (this.drawToggle) {
+            this.mousePencilTool(event);
+        }
+    };
+    Tools.prototype.handleTouchMove = function (event) {
+        event.preventDefault();
+        for (var i = 0; i < eventStack.length; i++) {
+            if (eventStack[i].pointerId === event.pointerId) {
+                eventStack[i] = event;
+            }
+        }
+        if (eventStack.length > 3) {
+            eventStack.splice(0, 3);
+        }
+        this.p1 = eventStack[0];
+        this.p2 = eventStack[1];
+        if (this.drawToggle) {
+            this.touchPencilTool(eventStack[0]);
+        }
+        if (eventStack.length >= 2) {
+            this.drawToggle = false;
+            this.dx = (this.p1.pageX + this.p2.pageX) / 2;
+            this.dy = (this.p1.pageY + this.p2.pageY) / 2;
+            this.dist = this._calclationPointsDistance(this.p1.pageX, this.p1.pageY, this.p2.pageX, this.p2.pageY);
+            this.nowR = this.dist / this.pinchDist;
+        }
+        this._pinchHandle(this.dist / this.pinchDist);
+    };
+    // ---- PointerEvents ---
+    // *--------  UP  --------
+    Tools.prototype.handlePenUp = function (event) {
+        this.drawToggle = false;
+        // @ts-ignore
+        this.context.beginPath();
+    };
+    Tools.prototype.handleTouchUp = function (event) {
+        this.drawToggle = false;
+        // @ts-ignore
+        this.context.beginPath();
+        this._removeEventStack(event);
+    };
+    Tools.prototype.handleMouseUp = function (event) {
+        this.drawToggle = false;
+        // @ts-ignore
+        this.context.beginPath();
+    };
+    // ---- PointerEvents ---
+    // *------- LEAVE -------
+    Tools.prototype.leavePointerHandler = function (event) {
+        this.drawToggle = false;
+    };
+    // ---- MouseEvents ----
+    // *-- LEGACY EVENTS --
+    Tools.prototype.downMouseHandler = function (event) {
+        this.drawToggle = true;
+    };
+    Tools.prototype.moveMouseHandler = function (event) {
+        this.handleMouseMove(event);
+    };
+    Tools.prototype.upMouseHandler = function (event) {
+        this.drawToggle = false;
+        // @ts-ignore
+        this.context.beginPath();
+    };
+    Tools.prototype.leaveMouseHandler = function (event) {
+        this.drawToggle = false;
+    };
+    // ---- PencilTools ----
+    // マウス用PencilTool
+    Tools.prototype.mousePencilTool = function (event) {
+        // Context2D初期化
+        // @ts-ignore
+        var a = this.context;
+        // 消しゴムトグル
+        this.eraseTool(a);
+        this.settingPenConf(a, this.canvasColor, this.capStyle, this.joinStyle);
+        this.drawLine(a, event);
+    };
+    // ペン用PencilTool
+    Tools.prototype.penPencilTool = function (event) {
+        // Context2D初期化
+        // @ts-ignore
+        var a = this.context;
+        // 消しゴムトグル
+        this.eraseTool(a);
+        a.lineWidth = this._activatePressure(event);
+        this.settingPenConf(a, this.canvasColor, this.capStyle, this.joinStyle);
+        this.drawLine(a, event);
+    };
+    Tools.prototype.settingPenConf = function (context, color, capStyle, JoinStyle) {
+        context.strokeStyle = color;
+        context.fillStyle = color;
+        context.lineCap = capStyle;
+        context.lineJoin = JoinStyle;
+    };
+    // タッチ用PencilTool
+    Tools.prototype.touchPencilTool = function (event) {
+        // Context2D初期化
+        // @ts-ignore
+        var a = this.context;
+        // 消しゴムトグル
+        this.eraseTool(a);
+        a.lineWidth = this.penRadius;
+        this.settingPenConf(a, this.canvasColor, this.capStyle, this.joinStyle);
+        this.drawLine(a, event);
+    };
+    Tools.prototype.drawLine = function (a, event) {
+        a.lineTo(event.offsetX, event.offsetY);
+        a.stroke();
+        a.beginPath();
+        a.moveTo(event.offsetX, event.offsetY);
+    };
+    Tools.prototype.eraseTool = function (a) {
+        this.eraserToggle
+            ? (a.globalCompositeOperation = 'destination-out')
+            : (a.globalCompositeOperation = 'source-over');
+    };
+    Tools.prototype.setPencilColor = function (color) {
+        this.canvasColor = color;
+    };
+    Tools.prototype._calclationPointsDistance = function (p1x, p1y, p2x, p2y) {
+        var X = p1x - p2x;
+        var Y = p1y - p2y;
+        return Math.sqrt(X * X + Y * Y) / 2;
+    };
+    // 筆圧に対応していた場合値を返す
+    Tools.prototype._activatePressure = function (event) {
+        var Rad = this.defRad;
+        if (event.pressure < 0.995 || event.pressure > 0.05) {
+            event.pressure ? (Rad *= event.pressure) : (Rad /= event.pressure);
+            return Rad;
+        }
+        else if (event.pressure <= 0.05 || event.pressure > 0.01) {
+            return 0.05;
+        }
+        else {
+            return;
+        }
+    };
+    // タッチイベントをスタックから削除
+    Tools.prototype._removeEventStack = function (event) {
+        for (var i = 0; i < eventStack.length; i++) {
+            if (eventStack[i].pointerId === event.pointerId) {
+                eventStack.splice(i, 1);
+            }
+        }
+    };
+    // ピンチズーム処理
+    Tools.prototype._pinchHandle = function (nowScalse) {
+        var style = document.getElementById('canvas').style;
+        var scale = "scale(" + this.nowR + "," + this.nowR + ")";
+        style.left = this.distX + 'px';
+        style.top = this.distY + 'px';
+        style.transform = scale;
+        style.webkitTransform = scale;
+    };
+    Tools.prototype._supportPointerEvent = function () {
+        return window.PointerEvent ? true : false;
+    };
+    Tools.prototype._puressurePoints = function (event) {
+        return {
+            x: event.offsetX,
+            y: event.offsetY,
+            pressurevent: event.pressure,
+        };
+    };
+    // ----- 画面上にデバッグ情報が流れる
+    Tools.prototype._debugLogger = function (message) {
+        if (document.getElementById('debug')) {
+            document.getElementById('debug').insertAdjacentHTML('afterbegin', message + '<br>');
+        }
+        else {
+            var el = document.createElement('div');
+            el.id = 'debug';
+            el.insertAdjacentHTML('afterbegin', message + '<br>');
+        }
+    };
+    return Tools;
+}(Application));
+var graph = document.querySelector('#canvas');
+var c = graph.getContext('2d');
+var app = new Application(graph, c);
+var draw = new Tools(graph, c);
+// Application.prototype.init
+//    (context , backgroundColor, hideMenu, smoothRendering)
+app.setUpView(1920, 1080, c, '#ffff', true, false);
+
 
 /***/ })
 
 /******/ });
+//# sourceMappingURL=index.js.map

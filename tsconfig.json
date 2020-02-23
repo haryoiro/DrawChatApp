@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "outDir": "Server",
+    "outDir": "./dist/",
     "noImplicitAny": true,
     "sourceMap": true,
     "target": "es5",
