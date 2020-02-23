@@ -358,7 +358,7 @@ class Tools {
     return {
       x: event.offsetX,
       y: event.offsetY,
-      pressurevent: Math.sin(event.pressure)
+      pressurevent: event.pressure
     };
   }
 
