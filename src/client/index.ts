@@ -102,9 +102,9 @@ class Tools {
   }
   public eventActivation() {
     if (this._supportPointerEvent) {
-      document.addEventListener("pointerdown",event => this.downPointerHandler(event),{ passive: false });
-      document.addEventListener("pointerup",event => this.upPointerHandler(event),{ passive: false });
-      document.addEventListener("pointermove",event => this.movePointerHandler(event),{ passive: false });
+      document.addEventListener("pointerdown",event => this.downPointerController(event),{ passive: false });
+      document.addEventListener("pointerup",event => this.upPointerController(event),{ passive: false });
+      document.addEventListener("pointermove",event => this.movePointerController(event),{ passive: false });
       document.addEventListener("pointerleave",event => this.leavePointerHandler(event),{ passive: false });
     } else {
       document.addEventListener("pointerdown", event =>this.downMouseHandler(event));
@@ -131,21 +131,21 @@ class Tools {
   // ---- PointerEvents ---
   // !------ Switcher ------
   // *- Main Callback Functions -
-  public downPointerHandler(event: PointerEvent): void  {
+  public downPointerController(event: PointerEvent): void  {
     this.pointerSwitcher(event, {
       pen: this.handlePenDown(event),
       touch: this.handleTouchDown(event),
       mouse: this.handleMouseDown(event)
     })
   }
-  public movePointerHandler(event: PointerEvent): void  {
+  public movePointerController(event: PointerEvent): void  {
     this.pointerSwitcher(event, {
       pen: this.handlePenMove(event),
       touch: this.handleTouchMove(event),
       mouse: this.handleMouseMove(event)
     });
   }
-  public upPointerHandler(event: PointerEvent): void  {
+  public upPointerController(event: PointerEvent): void  {
     this.pointerSwitcher(event, {
       pen: this.handlePenUp(event),
       touch: this.handleTouchUp(event),
