@@ -21,3 +21,6 @@ package-lock.json
 firebase.json
 .firebase
 .firebaseerc
+
+#my
+/temp
