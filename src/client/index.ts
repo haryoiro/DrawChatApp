@@ -124,7 +124,6 @@ class Tools {
       this.p2 = eventStack[1];
       this.pinchDist = this._calclationPointsDistance(this.p1.pageX, this.p1.pageY, this.p2.pageX, this.p2.pageY)
       this.nowR = this.dist / this.pinchDist
-      console.log('down: '+this.nowR)
 
     }
   }
@@ -156,7 +155,6 @@ class Tools {
     //@ts-ignore
     this.context.beginPath();
     this._removeEventStack(event);
-    console.log('up: '+this.nowR)
   }
   public leavePointerHandler(event: PointerEvent) {
     this.drawToggle = false;
@@ -209,11 +207,9 @@ class Tools {
       this.drawToggle = false;
       this.dx = (this.p1.pageX + this.p2.pageX) / 2;
       this.dy = (this.p1.pageY + this.p2.pageY) / 2;
-      console.log('dx:'+this.dx+'dy'+this.dy)
 
       this.dist = this._calclationPointsDistance(this.p1.pageX, this.p1.pageY, this.p2.pageX, this.p2.pageY)
       this.nowR = this.dist / this.pinchDist
-      console.log('nowR:'+this.nowR)
     }
     this._pinchHandle(this.dist / this.pinchDist);
   }
