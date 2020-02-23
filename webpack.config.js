@@ -19,7 +19,7 @@ module.exports = [{
     publicPath: "/",
     filename: `[name].js`,
     // expressでpublicフォルダ直下を静的に読み込むように設定するので、そこへ出力
-    path: `${__dirname}/Public/js`
+    path: `${__dirname}/Public/JS`
   },
   module: {
     rules: [{
@@ -41,7 +41,7 @@ module.exports = [{
   plugins: [
     new HtmlWebpackPlugin({
       template:  path.join(__dirname, 'src/client/view/index.pug'),
-      filename: "../html/index.html",
+      filename: "../HTML/index.html",
       path: `${__dirname}/Public`
     })
   ]

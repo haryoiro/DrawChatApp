@@ -6,7 +6,7 @@
   "author": "haryoiro <mizusecocolte@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "dev": "webpack --mode development -w",
+    "dev": "webpack --mode development",
     "build": "webpack --mode production",
     "ser": "node dist/server.js -w"
   },
