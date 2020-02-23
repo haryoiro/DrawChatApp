@@ -283,7 +283,6 @@ class Tools extends Application {
   }
 
   // ---- PencilTools ----
-  // PencilTool ------- 🖍
   public pencilTool(event: MouseEvent): void {
     this.eraseTool();
     this.settingPenConf(this.canvasColor, this.capStyle, this.joinStyle);
