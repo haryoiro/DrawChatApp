@@ -1,6 +1,5 @@
 const path = require("path");
 const nodeExtarnals = require("webpack-node-externals");
-const NodemonPlugin = require("nodemon-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = [
@@ -17,10 +16,9 @@ module.exports = [
     },
     // 出力設定
     output: {
-      publicPath: "/",
       filename: `./JS/index.js`,
       // expressでpublicフォルダ直下を静的に読み込むように設定するので、そこへ出力
-      path: `${__dirname}/Public/`
+      path: `${__dirname}/Public`
     },
     module: {
       rules: [
@@ -79,7 +77,8 @@ module.exports = [
     plugins: [
       new HtmlWebpackPlugin({
         template: path.join(__dirname, "src/client/view/index.pug"),
-        filename: "./HTML/index.html"
+        filename: "./index.html",
+        path: `${__dirname}/Public/HTML/`
       })
     ]
   },
@@ -120,7 +119,6 @@ module.exports = [
         }
       ]
     },
-    plugins: [new NodemonPlugin()],
     resolve: {
       extensions: [".js", ".ts", ".json"]
     }

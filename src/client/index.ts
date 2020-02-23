@@ -1,48 +1,47 @@
 interface Canvas {
   canvas: HTMLCanvasElement;
-  context: CanvasRenderingContext2D;
+  context2D: CanvasRenderingContext2D | any;
 }
 
 class Application implements Canvas {
   canvas: HTMLCanvasElement;
-  context: CanvasRenderingContext2D;
+  context2D: CanvasRenderingContext2D;
   private _width: number;
   private _height: number;
-  constructor(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) {
+  constructor(canvas: HTMLCanvasElement, context2D: CanvasRenderingContext2D) {
     this.canvas = canvas;
-    this.context = context;
+    this.context2D = context2D;
   }
   public setUpView(
     width: number,
     height: number,
-    context: CanvasRenderingContext2D,
     color: string,
     hide: boolean,
-    smooth = false,
-  ) {
+    smooth: boolean = false,
+  ): void {
     this._settingCanvasSize(width, height);
     this._backgroundColor(color);
     this._hideMenuHandler(hide);
-    this._isImageSmoothing(context, smooth);
+    this._isImageSmoothing(smooth);
   }
-  private _settingCanvasSize(width: number, height: number) {
+  private _settingCanvasSize(width: number, height: number): void {
     this.canvas.width = width;
     this.canvas.height = height;
   }
-  public clearAll() {
-    this.context.clearRect(0, 0, this.width, this.height);
-    this.context.beginPath();
+  public clearAll(): void {
+    this.context2D.clearRect(0, 0, this.width, this.height);
+    this.context2D.beginPath();
   }
-  private _backgroundColor(color: string) {
-    this.context.fillStyle = color;
-    this.context.fillRect(0, 0, this.width, this.height);
+  private _backgroundColor(color: string): void {
+    this.context2D.fillStyle = color;
+    this.context2D.fillRect(0, 0, this.width, this.height);
   }
-  private _hideMenuHandler(bool: boolean) {
+  private _hideMenuHandler(bool: boolean): void {
     document.addEventListener('contextmenu', () => bool);
     document.addEventListener('MSHoldVisal', () => bool);
   }
-  private _isImageSmoothing(context: CanvasRenderingContext2D, bool: boolean) {
-    context.imageSmoothingEnabled = bool;
+  private _isImageSmoothing(bool: boolean): void {
+    this.context2D.imageSmoothingEnabled = bool;
   }
   // *getter/setter Method
   public get width(): number {
@@ -60,14 +59,16 @@ class Application implements Canvas {
 }
 
 const eventStack: PointerEvent[] = [];
-
+interface drawPointsObject {
+  X: number
+  Y: number
+  pressure: number
+}
 class Tools extends Application {
   // ----- DOM要素 -----
-  element: HTMLCanvasElement;
-  context: CanvasRenderingContext2D;
   pointerEventHandler: boolean;
   // ----- ツール関連プロパティ
-  canvasColor: string | number = '#000';
+  canvasColor:  string = "#000"
   drawToggle: boolean;
   eraserToggle: boolean;
   pressureToggle: boolean;
@@ -89,16 +90,18 @@ class Tools extends Application {
   dy = 0;
   distX: number; // 横からの距離
   distY: number; // 上からの距離
-  lx: number = void 0;
-  ly: number = void 0;
-  capStyle = 'round';
-  joinStyle = 'bevel';
+  lx: number = undefined;
+  ly: number = undefined;
+  capStyle: CanvasLineCap = 'round';
+  joinStyle: CanvasLineJoin = 'bevel';
 
-  constructor(element: HTMLCanvasElement, context: CanvasRenderingContext2D) {
-    super(element, context);
+  drawPointObject: drawPointsObject
+
+  constructor(element: HTMLCanvasElement, context2D: CanvasRenderingContext2D | any) {
+    super(element, context2D);
     this.eventActivation();
   }
-  public eventActivation() {
+  public eventActivation(): void {
     if (this._supportPointerEvent) {
       document.addEventListener('pointerdown', event => this.downPointerController(event), {
         passive: false,
@@ -106,17 +109,21 @@ class Tools extends Application {
       document.addEventListener('pointerup', event => this.upPointerController(event), {
         passive: false,
       });
-      document.addEventListener('pointermove', event => this.movePointerController(event), {
+      document.addEventListener('pointermove', event => {
+        this.movePointerController(event)
+        this.drawPointObject = {X: event.offsetX, Y: event.offsetY, pressure: event.pressure}
+        console.log(this.drawPointObject)
+      }, {
         passive: false,
       });
-      document.addEventListener('pointerleave', event => this.leavePointerHandler(event), {
+      document.addEventListener('pointerleave', () => this.leavePointerHandler(), {
         passive: false,
       });
     } else {
-      document.addEventListener('pointerdown', event => this.downMouseHandler(event));
-      document.addEventListener('pointerup', event => this.upMouseHandler(event));
-      document.addEventListener('pointermove', event => this.moveMouseHandler(event));
-      document.addEventListener('pointerleave', event => this.leaveMouseHandler(event));
+      document.addEventListener('mousedown', () => this.downMouseHandler());
+      document.addEventListener('mouseup', () => this.upMouseHandler());
+      document.addEventListener('mousemove', event => this.moveMouseHandler(event));
+      document.addEventListener('mouseleave', () => this.leaveMouseHandler());
     }
   }
   public pointerSwitcher(event: PointerEvent, pen: void, touch: void, mouse: void): void {
@@ -154,9 +161,9 @@ class Tools extends Application {
   public upPointerController(event: PointerEvent): void {
     this.pointerSwitcher(
       event,
-      this.handlePenUp(event),
+      this.handlePenUp(),
       this.handleTouchUp(event),
-      this.handleMouseUp(event),
+      this.handleMouseUp(),
     );
   }
   // ---- PointerEvents ---
@@ -164,10 +171,12 @@ class Tools extends Application {
   private handlePenDown(event: PointerEvent): void {
     event.preventDefault();
     this.drawToggle = true;
+    this.context2D.lineWidth = this._activatePressure(event)
   }
   private handleTouchDown(event: PointerEvent): void {
     event.preventDefault();
     this.drawToggle = true;
+    this.context2D.lineWidth = this._activatePressure(event)
     if (eventStack.length <= 1) {
       this.p1 = eventStack[0];
     } else if (eventStack.length >= 2) {
@@ -184,6 +193,7 @@ class Tools extends Application {
   }
   private handleMouseDown(event: PointerEvent): void {
     this.drawToggle = true;
+    this.context2D.lineWidth = this._activatePressure(event)
   }
 
   // ---- PointerEvents ---
@@ -191,12 +201,12 @@ class Tools extends Application {
   public handlePenMove(event: PointerEvent): void {
     event.preventDefault();
     if (this.drawToggle) {
-      this.penPencilTool(event);
+      this.pencilTool(event);
     }
   }
   public handleMouseMove(event: PointerEvent | MouseEvent): void {
     if (this.drawToggle) {
-      this.mousePencilTool(event);
+      this.pencilTool(event);
     }
   }
   public handleTouchMove(event: PointerEvent): void {
@@ -213,7 +223,7 @@ class Tools extends Application {
     this.p1 = eventStack[0];
     this.p2 = eventStack[1];
     if (this.drawToggle) {
-      this.touchPencilTool(eventStack[0]);
+      this.pencilTool(eventStack[0]);
     }
 
     if (eventStack.length >= 2) {
@@ -229,124 +239,92 @@ class Tools extends Application {
       );
       this.nowR = this.dist / this.pinchDist;
     }
-    this._pinchHandle(this.dist / this.pinchDist);
+    this._pinchHandle();
   }
 
   // ---- PointerEvents ---
   // *--------  UP  --------
-  private handlePenUp(event: PointerEvent): void {
+  private handlePenUp(): void {
     this.drawToggle = false;
-    // @ts-ignore
-    this.context.beginPath();
+    this.context2D.beginPath();
   }
   private handleTouchUp(event: PointerEvent): void {
     this.drawToggle = false;
     // @ts-ignore
-    this.context.beginPath();
+    this.context2D.beginPath();
     this._removeEventStack(event);
   }
-  private handleMouseUp(event: PointerEvent): void {
+  private handleMouseUp(): void {
     this.drawToggle = false;
-    // @ts-ignore
-    this.context.beginPath();
+    this.context2D.beginPath();
   }
 
   // ---- PointerEvents ---
   // *------- LEAVE -------
-  public leavePointerHandler(event: PointerEvent): void {
+  public leavePointerHandler(): void {
     this.drawToggle = false;
   }
 
   // ---- MouseEvents ----
   // *-- LEGACY EVENTS --
-  public downMouseHandler(event: MouseEvent): void {
+  public downMouseHandler(): void {
     this.drawToggle = true;
   }
   public moveMouseHandler(event: MouseEvent): void {
+    this.context2D.lineWidth = this.defRad
     this.handleMouseMove(event);
   }
-  public upMouseHandler(event: MouseEvent): void {
+  public upMouseHandler(): void {
     this.drawToggle = false;
-    // @ts-ignore
-    this.context.beginPath();
+    this.context2D.beginPath();
   }
-  public leaveMouseHandler(event: MouseEvent): void {
+  public leaveMouseHandler(): void {
     this.drawToggle = false;
   }
 
   // ---- PencilTools ----
-  // マウス用PencilTool
-  public mousePencilTool(event: MouseEvent | PointerEvent) {
-    // Context2D初期化
-    // @ts-ignore
-    const a: any = this.context;
-    // 消しゴムトグル
-    this.eraseTool(a);
-
-    this.settingPenConf(a, this.canvasColor, this.capStyle, this.joinStyle);
-    this.drawLine(a, event);
-  }
-
-  // ペン用PencilTool
-  public penPencilTool(event: PointerEvent) {
-    // Context2D初期化
-    // @ts-ignore
-    const a: any = this.context;
-    // 消しゴムトグル
-    this.eraseTool(a);
-    a.lineWidth = this._activatePressure(event);
-    this.settingPenConf(a, this.canvasColor, this.capStyle, this.joinStyle);
-    this.drawLine(a, event);
+  // PencilTool ------- 🖍
+  public pencilTool(event: MouseEvent): void {
+    this.eraseTool();
+    this.settingPenConf(this.canvasColor, this.capStyle, this.joinStyle);
+    this.drawLine(this.drawPointObject.X, this.drawPointObject.Y);
+    console.log(this.drawPointObject.X, this.drawPointObject.Y)
   }
 
   private settingPenConf(
-    context: any,
-    color: string | number,
-    capStyle: string,
-    JoinStyle: string,
-  ) {
-    context.strokeStyle = color;
-    context.fillStyle = color;
-    context.lineCap = capStyle;
-    context.lineJoin = JoinStyle;
+    color: string,
+    capStyle: CanvasLineCap,
+    JoinStyle: CanvasLineJoin,
+  ): void {
+    this.context2D.strokeStyle = color;
+    this.context2D.fillStyle = color;
+    this.context2D.lineCap = capStyle;
+    this.context2D.lineJoin = JoinStyle;
   }
 
-  // タッチ用PencilTool
-  public touchPencilTool(event: PointerEvent) {
-    // Context2D初期化
-    // @ts-ignore
-    const a: any = this.context;
-    // 消しゴムトグル
-    this.eraseTool(a);
-    a.lineWidth = this.penRadius;
-    this.settingPenConf(a, this.canvasColor, this.capStyle, this.joinStyle);
-
-    this.drawLine(a, event);
+  public drawLine(x: number, y: number): void {
+    this.context2D.lineTo(x, y);
+    this.context2D.stroke();
+    this.context2D.beginPath();
+    this.context2D.moveTo(x, y);
   }
 
-  private drawLine(a: any, event: PointerEvent | MouseEvent) {
-    a.lineTo(event.offsetX, event.offsetY);
-    a.stroke();
-    a.beginPath();
-    a.moveTo(event.offsetX, event.offsetY);
-  }
-
-  private eraseTool(a: any) {
+  private eraseTool(): void {
     this.eraserToggle
-      ? (a.globalCompositeOperation = 'destination-out')
-      : (a.globalCompositeOperation = 'source-over');
+      ? (this.context2D.globalCompositeOperation = 'destination-out')
+      : (this.context2D.globalCompositeOperation = 'source-over');
   }
-  public setPencilColor(color: string | number) {
+  public setPencilColor(color: string): void {
     this.canvasColor = color;
   }
-  private _calclationPointsDistance(p1x: number, p1y: number, p2x: number, p2y: number) {
+  private _calclationPointsDistance(p1x: number, p1y: number, p2x: number, p2y: number): number {
     const X = p1x - p2x;
     const Y = p1y - p2y;
     return Math.sqrt(X * X + Y * Y) / 2;
   }
 
   // 筆圧に対応していた場合値を返す
-  private _activatePressure(event: PointerEvent) {
+  private _activatePressure(event: PointerEvent): number {
     let Rad = this.defRad;
     if (event.pressure < 0.995 || event.pressure > 0.05) {
       event.pressure ? (Rad *= event.pressure) : (Rad /= event.pressure);
@@ -358,7 +336,7 @@ class Tools extends Application {
     }
   }
   // タッチイベントをスタックから削除
-  private _removeEventStack(event: PointerEvent) {
+  private _removeEventStack(event: PointerEvent): void {
     for (let i = 0; i < eventStack.length; i++) {
       if (eventStack[i].pointerId === event.pointerId) {
         eventStack.splice(i, 1);
@@ -366,7 +344,7 @@ class Tools extends Application {
     }
   }
   // ピンチズーム処理
-  private _pinchHandle(nowScalse: number) {
+  private _pinchHandle(): void {
     const style = document.getElementById('canvas').style;
     const scale = `scale(${this.nowR},${this.nowR})`;
     style.left = this.distX + 'px';
@@ -374,19 +352,25 @@ class Tools extends Application {
     style.transform = scale;
     style.webkitTransform = scale;
   }
-  private _supportPointerEvent() {
+  private _supportPointerEvent(): boolean {
     return window.PointerEvent ? true : false;
   }
-  private _puressurePoints(event: PointerEvent) {
+  private _puressurePoints(event: PointerEvent): any{
+    return {
+      Y: event.offsetX,
+      X: event.offsetY,
+      pressure: event.pressure
+    };
+  }
+  private _simplePoints(event: MouseEvent): object{
     return {
       x: event.offsetX,
-      y: event.offsetY,
-      pressurevent: event.pressure,
-    };
+      y: event.offsetY
+    }
   }
 
   // ----- 画面上にデバッグ情報が流れる
-  private _debugLogger(message: string | number) {
+  private _debugLogger(message: string | number): void {
     if (document.getElementById('debug')) {
       document.getElementById('debug').insertAdjacentHTML('afterbegin', message + '<br>');
     } else {
@@ -399,9 +383,8 @@ class Tools extends Application {
 const graph: HTMLCanvasElement = document.querySelector('#canvas');
 const c: CanvasRenderingContext2D = graph.getContext('2d');
 
-const app = new Application(graph, c);
-const draw = new Tools(graph, c);
+const app = new Tools(graph, c);
 
 // Application.prototype.init
 //    (context , backgroundColor, hideMenu, smoothRendering)
-app.setUpView(1920, 1080, c, '#ffff', true, false);
+app.setUpView(1920, 1080, '#ffff', true, false);

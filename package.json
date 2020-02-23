@@ -1,6 +1,6 @@
 {
   "name": "app-drawn",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "main": "index.js",
   "repository": "https://github.com/haryoiro/App-Drawn",
   "author": "haryoiro <mizusecocolte@gmail.com>",
@@ -8,7 +8,7 @@
   "scripts": {
     "lint": "eslint src/**/index.ts",
     "lint:fix": "eslint --fix src/**/index.ts",
-    "dev": "webpack --mode development",
+    "dev": "webpack --mode development ",
     "build": "webpack --mode production",
     "ser": "node dist/server.js -w"
   },
@@ -26,7 +26,6 @@
     "eslint-plugin-prettier": "^3.1.2",
     "express": "^4.17.1",
     "html-webpack-plugin": "^3.2.0",
-    "nodemon-webpack-plugin": "^4.2.2",
     "postcss-loader": "^3.0.0",
     "prettier": "^1.19.1",
     "pug": "^2.0.4",

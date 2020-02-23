@@ -4,7 +4,10 @@
     "noImplicitAny": true,
     "sourceMap": true,
     "target": "es5",
-    "module": "es2015",
+    "module": "commonjs",
     "allowJs": true
-  }
+  },
+  "include": [
+    "src/**/*"
+  ],
 }
