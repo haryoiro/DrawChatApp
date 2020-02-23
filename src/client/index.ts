@@ -6,58 +6,57 @@ interface Canvas {
 class Application implements Canvas {
   canvas: HTMLCanvasElement;
   context: CanvasRenderingContext2D | any;
-  width: number;
-  height: number;
-  rect: ClientRect;
+  private _width: number;
+  private _height: number;
   constructor(
     canvas: HTMLCanvasElement,
     context: CanvasRenderingContext2D,
-    width: number,
-    height: number
   ) {
-    this.width = width;
-    this.height = height;
     this.canvas = canvas;
     this.context = context;
-    this.rect = this.canvas.getBoundingClientRect();
   }
-  public init(
-    context: CanvasRenderingContext2D,
-    color: string,
-    hide: boolean,
-    smooth: boolean = false
-  ) {
-    this.canvasSize();
-    this.backgroundColor(color);
-    this.hideMenuHandler(hide);
+  public setUpView(
+    width: number, height: number,
+    context: CanvasRenderingContext2D, color: string,
+    hide: boolean, smooth: boolean = false) {
+    this._settingCanvasSize(width, height);
+    this._backgroundColor(color);
+    this._hideMenuHandler(hide);
     this._isImageSmoothing(context, smooth);
   }
-  public getRect() {
-    //@ts-ignore
-    return (this.rect = this.canvas.getBoundingRect());
-  }
-  private canvasSize() {
-    if (this.width || this.height) {
-      this.canvas.width = this.width;
-      this.canvas.height = this.height;
-      this.context.width = this.width;
-      this.context.height = this.height;
-    }
+  private _settingCanvasSize(width: number, height: number) {
+      this.canvas.width = width
+      this.canvas.height = height;
+      this.context.width = width;
+      this.context.height = height;
   }
   public clearAll() {
     this.context.clearRect(0, 0, this.width, this.height);
     this.context.beginPath();
   }
-  private backgroundColor(color: string) {
+  private _backgroundColor(color: string) {
     this.context.fillStyle = color;
     this.context.fillRect(0, 0, this.width, this.height);
   }
-  private hideMenuHandler(bool: boolean) {
+  private _hideMenuHandler(bool: boolean) {
     document.addEventListener("contextmenu", () => bool);
     document.addEventListener("MSHoldVisal", () => bool);
   }
   private _isImageSmoothing(context: CanvasRenderingContext2D, bool: boolean) {
     context.imageSmoothingEnabled = bool;
+  }
+  // *getter/setter Method
+  public get width(): number {
+    return this._width;
+  }
+  public set width(value: number) {
+    this._width = value;
+  }
+  public get height(): number {
+    return this._height;
+  }
+  public set height(value: number) {
+    this._height = value;
   }
 }
 
@@ -345,9 +344,9 @@ class Tools {
 const graph: HTMLCanvasElement = document.querySelector("#canvas");
 const c: CanvasRenderingContext2D = graph.getContext("2d");
 
-const app = new Application(graph, c, 1920, 1080);
+const app = new Application(graph, c);
 const draw = new Tools(graph, c);
 
 // Application.prototype.init
 //    (context , backgroundColor, hideMenu, smoothRendering)
-app.init(c, "#ffff", true, false);
+app.setUpView(1920, 1080, c, "#ffff", true, false);
