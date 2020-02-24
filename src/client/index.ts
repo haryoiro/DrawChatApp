@@ -1,13 +1,8 @@
-interface Canvas {
-  canvas: HTMLCanvasElement;
-  context2D: CanvasRenderingContext2D | any;
-}
-
-class Application implements Canvas {
-  canvas: HTMLCanvasElement;
-  context2D: CanvasRenderingContext2D;
-  private _width: number;
-  private _height: number;
+class Application{
+  public canvas: HTMLCanvasElement;
+  public context2D: CanvasRenderingContext2D;
+  private _width!: number
+  private _height!: number 
   constructor(canvas: HTMLCanvasElement, context2D: CanvasRenderingContext2D) {
     this.canvas = canvas;
     this.context2D = context2D;
@@ -65,44 +60,36 @@ interface drawPointsObject {
   pressure: number
 }
 class Tools extends Application {
-  // ----- DOM要素 -----
-  pointerEventHandler: boolean;
   // ----- ツール関連プロパティ
   canvasColor:  string = "#000"
-  drawToggle: boolean;
-  eraserToggle: boolean;
-  pressureToggle: boolean;
+  private drawToggle: boolean = false
+  private eraserToggle: boolean  = false
+  private pressureToggle: boolean = false
   // ----- Pinch/Zoom用プロパティ -----
-  pinchDist: number;
-  basePoint: PointerEvent;
-  nowX: number;
-  nowY: number;
-  nowR: number; // 現在の拡大率
-  nowScale: number;
-  p1: PointerEvent; // 最初に触れた指
-  p2: PointerEvent; // 次に触れた指
-  dist: number;
+  private pinchDist!: number
+  private nowR!: number // 現在の拡大率
+  private p1!: PointerEvent; // 最初に触れた指
+  private p2!: PointerEvent  // 次に触れた指
+  private dx!: number
+  private dy!: number
+  private dist!: number
   private zoomInvrease = 1;
   // ----- PenSize用プロパティ -----
-  defRad = 10;
-  penRadius: number;
-  dx = 0;
-  dy = 0;
-  distX: number; // 横からの距離
-  distY: number; // 上からの距離
-  lx: number = undefined;
-  ly: number = undefined;
-  capStyle: CanvasLineCap = 'round';
-  joinStyle: CanvasLineJoin = 'bevel';
+  private defRad = 10;
+  private penRadius!: number
+  private distX!: number // 横からの距離
+  private distY!: number // 上からの距離
+  private capStyle: CanvasLineCap = 'round';
+  private joinStyle: CanvasLineJoin = 'bevel';
 
-  drawPointObject: drawPointsObject
+  public drawPointObject!: drawPointsObject
 
   constructor(element: HTMLCanvasElement, context2D: CanvasRenderingContext2D | any) {
     super(element, context2D);
     this.eventActivation();
   }
   public eventActivation(): void {
-    if (this._supportPointerEvent) {
+    if (window.PointerEvent) {
       document.addEventListener('pointerdown', event => this.downPointerController(event), {
         passive: false,
       });
@@ -112,7 +99,6 @@ class Tools extends Application {
       document.addEventListener('pointermove', event => {
         this.movePointerController(event)
         this.drawPointObject = {X: event.offsetX, Y: event.offsetY, pressure: event.pressure}
-        console.log(this.drawPointObject)
       }, {
         passive: false,
       });
@@ -151,6 +137,8 @@ class Tools extends Application {
     );
   }
   public movePointerController(event: PointerEvent): void {
+
+    this.context2D.lineWidth = this._activatePressure(event)
     this.pointerSwitcher(
       event,
       this.handlePenMove(event),
@@ -193,7 +181,6 @@ class Tools extends Application {
   }
   private handleMouseDown(event: PointerEvent): void {
     this.drawToggle = true;
-    this.context2D.lineWidth = this._activatePressure(event)
   }
 
   // ---- PointerEvents ---
@@ -230,6 +217,8 @@ class Tools extends Application {
       this.drawToggle = false;
       this.dx = (this.p1.pageX + this.p2.pageX) / 2;
       this.dy = (this.p1.pageY + this.p2.pageY) / 2;
+      let tdx = []
+      tdx.push(this.dx)
 
       this.dist = this._calclationPointsDistance(
         this.p1.pageX,
@@ -287,7 +276,6 @@ class Tools extends Application {
     this.eraseTool();
     this.settingPenConf(this.canvasColor, this.capStyle, this.joinStyle);
     this.drawLine(this.drawPointObject.X, this.drawPointObject.Y);
-    console.log(this.drawPointObject.X, this.drawPointObject.Y)
   }
 
   private settingPenConf(
@@ -331,7 +319,7 @@ class Tools extends Application {
     } else if (event.pressure <= 0.05 || event.pressure > 0.01) {
       return 0.05;
     } else {
-      return;
+      return Rad;
     }
   }
   // タッチイベントをスタックから削除
@@ -344,15 +332,12 @@ class Tools extends Application {
   }
   // ピンチズーム処理
   private _pinchHandle(): void {
-    const style = document.getElementById('canvas').style;
+    const style: CSSStyleDeclaration  = <CSSStyleDeclaration>document.getElementById('canvas')!.style;
     const scale = `scale(${this.nowR},${this.nowR})`;
     style.left = this.distX + 'px';
     style.top = this.distY + 'px';
     style.transform = scale;
     style.webkitTransform = scale;
-  }
-  private _supportPointerEvent(): boolean {
-    return window.PointerEvent ? true : false;
   }
   private _puressurePoints(event: PointerEvent): any{
     return {
@@ -371,7 +356,7 @@ class Tools extends Application {
   // ----- 画面上にデバッグ情報が流れる
   private _debugLogger(message: string | number): void {
     if (document.getElementById('debug')) {
-      document.getElementById('debug').insertAdjacentHTML('afterbegin', message + '<br>');
+      document.getElementById('debug')!.insertAdjacentHTML('afterbegin', message + '<br>');
     } else {
       const el = document.createElement('div');
       el.id = 'debug';
@@ -379,11 +364,11 @@ class Tools extends Application {
     }
   }
 }
-const graph: HTMLCanvasElement = document.querySelector('#canvas');
-const c: CanvasRenderingContext2D = graph.getContext('2d');
+const graph: HTMLCanvasElement = <HTMLCanvasElement>document.querySelector('#canvas');
+const c: CanvasRenderingContext2D = <CanvasRenderingContext2D>graph.getContext('2d');
 
-const app = new Tools(graph, c);
+const view = new Tools(graph, c);
 
 // Application.prototype.init
 //    (context , backgroundColor, hideMenu, smoothRendering)
-app.setUpView(1920, 1080, '#ffff', true, false);
+view.setUpView(1920, 1080, '#ffff', true, false);
