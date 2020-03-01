@@ -103,6 +103,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var cookie_parser__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(cookie_parser__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var socket_io__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! socket.io */ "socket.io");
 /* harmony import */ var socket_io__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(socket_io__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var path__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! path */ "path");
+/* harmony import */ var path__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(path__WEBPACK_IMPORTED_MODULE_4__);
+
 
 
 
@@ -112,12 +115,16 @@ const app = express__WEBPACK_IMPORTED_MODULE_0___default()();
 const server = app.listen(port, () => {
     console.log(`listening to requests on port: ${port}`);
 });
-const io = socket_io__WEBPACK_IMPORTED_MODULE_3___default()(server);
-app.use(express__WEBPACK_IMPORTED_MODULE_0___default.a.static('public'));
+app.use(express__WEBPACK_IMPORTED_MODULE_0___default.a.static(path__WEBPACK_IMPORTED_MODULE_4___default.a.join(__dirname, './public')));
+app.set('views', path__WEBPACK_IMPORTED_MODULE_4___default.a.join(__dirname, 'views'));
+app.set('view engine', 'pug');
 app.use(body_parser__WEBPACK_IMPORTED_MODULE_1___default.a.urlencoded({ extended: true }));
 app.use(body_parser__WEBPACK_IMPORTED_MODULE_1___default.a.json());
 app.use(cookie_parser__WEBPACK_IMPORTED_MODULE_2___default()());
-io.on('connection', (socket) => {
+app.get("/", (req, res) => {
+});
+const io = socket_io__WEBPACK_IMPORTED_MODULE_3___default()(server);
+io.on('connection', socket => {
     console.log('made socket conenction', socket.id);
     socket.on('chat', data => {
         io.sockets.emit('chat', data);
@@ -160,6 +167,17 @@ module.exports = require("cookie-parser");
 /***/ (function(module, exports) {
 
 module.exports = require("express");
+
+/***/ }),
+
+/***/ "path":
+/*!***********************!*\
+  !*** external "path" ***!
+  \***********************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("path");
 
 /***/ }),
 
