@@ -1,7 +1,7 @@
-# 使用するnode
+# 使用するnode.jsバージョン
 FROM node:10
 
-#
+# 仮想環境で使用するコマンドラインをshへ設定
 CMD ["sh"]
 
 ENV NODE_ENV=development
