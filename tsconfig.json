@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    // "incremental": true,
+    "target": "es6",
+    "module": "es2015",
+    "lib": [ "DOM","ES2020" ],
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "types": ["node", "express", "socket.io", "socket.io-client", "cookie-parser"],
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["./src/**/*"],
+  "exclude": ["./node_modules"]
+}

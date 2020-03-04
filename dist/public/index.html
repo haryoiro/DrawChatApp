@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8">
+  <title>DRAWN</title>
+  <meta property="og:title" content="Hello, drawing">
+  <meta property="og:type" content="website">
+  <meta property="og:description" content="ブラウザで簡単にお絵描きができるWebサービス">
+  <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+  <div class="pencilSettings"></div>
+  <div class="toolbar">
+    <ul class="buttons">
+      <li id="pencil" class="tools active"><svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewbox="-15 -15 50 50"><path d="M16.391,0,13.659,2.732,19.122,8.2l2.732-2.732ZM10.927,5.464,0,16.391v5.464H5.464L16.391,10.927Z" fill="#666668"/></svg></li>
+      <li id="eraser" class="tools"><svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewbox="-15 -15 50 50"><path d="M22.2,13.038a2.14,2.14,0,0,0,0-3.027L15.069,2.877a2.14,2.14,0,0,0-3.027,0L.627,14.292a2.14,2.14,0,0,0,0,3.027L4.908,21.6a2.141,2.141,0,0,0,1.514.627H22.3a.535.535,0,0,0,.535-.535V19.908a.535.535,0,0,0-.535-.535H15.869L22.2,13.038ZM8.709,10.246l6.126,6.126-3,3H6.717L3.149,15.805l5.56-5.56Z" transform="translate(0 -2.25)" fill="#666668"/></svg></li>
+      <li id="fill" class="tools"><svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewbox="-15 -15 50 50"><path d="M18.359,5.649V1.412A1.412,1.412,0,0,0,16.947,0H1.412A1.412,1.412,0,0,0,0,1.412V5.649A1.412,1.412,0,0,0,1.412,7.061H16.947A1.412,1.412,0,0,0,18.359,5.649Zm1.412-2.824V8.473a1.412,1.412,0,0,1-1.412,1.412H11.3A2.824,2.824,0,0,0,8.473,12.71v1.412a1.412,1.412,0,0,0-1.412,1.412v5.649A1.412,1.412,0,0,0,8.473,22.6H11.3a1.412,1.412,0,0,0,1.412-1.412V15.534A1.412,1.412,0,0,0,11.3,14.122V12.71h7.061A4.237,4.237,0,0,0,22.6,8.473V5.649A2.824,2.824,0,0,0,19.771,2.824Z" fill="#666668"/></svg></li>
+      <li id="palatte" class="tools"><svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewbox="-15 -15 50 50"><path d="M9.017.22A11.238,11.238,0,0,0,.23,8.976C-1.4,17.229,6.042,23.381,11.652,22.511a2.786,2.786,0,0,0,1.876-4.047,2.986,2.986,0,0,1,2.688-4.343h3.517A2.888,2.888,0,0,0,22.6,11.24,11.307,11.307,0,0,0,9.017.22Zm-4.78,13.9a1.412,1.412,0,1,1,1.412-1.412A1.411,1.411,0,0,1,4.237,14.122ZM5.649,8.473A1.412,1.412,0,1,1,7.062,7.06,1.411,1.411,0,0,1,5.649,8.473ZM11.3,5.648a1.412,1.412,0,1,1,1.412-1.412A1.411,1.411,0,0,1,11.3,5.648Zm5.649,2.825A1.412,1.412,0,1,1,18.36,7.06,1.411,1.411,0,0,1,16.948,8.473Z" transform="translate(-0.001 0.002)" fill="#666668"/></svg></li>
+      <li id="download" class="tools"><svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewbox="-16 -15 50 50"><path d="M25.58,12.473H20.2V4.5H12.128v7.973H6.75l9.415,9.3ZM6.75,24.436V27.1H25.58v-2.66Z" transform="translate(-6.75 -4.5)" fill="#666668"/></svg></li>
+      <li id="textChat" class="tools"><svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewbox="-16 -15 50 50"><path d="M21.3,3H5.034A2.04,2.04,0,0,0,3,5.034v18.3l4.067-4.067H21.3a2.04,2.04,0,0,0,2.034-2.034V5.034A2.04,2.04,0,0,0,21.3,3Z" transform="translate(-3 -3)" fill="#666668"/></svg></li>
+    </ul>
+  </div>
+  <div class="canvasWrapper">
+    <canvas id="canvas">
+      <h1>お使いのブラウザは非対応です</h1>
+      <h1>最新のブラウザのダウンロードをお願いします。</h1>
+    </canvas>
+  </div>
+  <script src = "/socket.io/socket.io.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.js"></script>
+<script type="text/javascript" src="index.js"></script></body>
+</html>

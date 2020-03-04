@@ -1,0 +1,106 @@
+*{
+  touch-action: none;
+  user-select: none;
+  pointer-events: none;
+  margin: none;
+  padding: none;
+}
+
+#canvasWrapper {
+  position: absolute;
+  width: 100vh;
+  height: 100vh;
+  touch-action: none;
+  user-select: none;
+  pointer-events: none;
+  background-color: #EFEFEF;
+}
+#canvas {
+  position: absolute;
+  box-shadow: 0px 3px 6px rgba(0,0,0,0.4);
+  touch-action: none;
+  user-select: none;
+  pointer-events: auto;
+  cursor: crosshair;
+}
+p {
+  position: absolute;
+  top:50px;
+  left:50px;
+  touch-action: none;
+  user-select: none;
+  pointer-events: none;
+}
+div {
+  position: absolute;
+  touch-action: none;
+  user-select: none;
+  pointer-events: none;
+}
+
+*::-webkit-scrollbar {
+  display: none;
+  pointer-events: none;
+}
+ul {
+  padding: none;
+  margin: none;
+}
+
+.toolbar {
+  left: -6px;
+  top: -6px;
+  width: 60px;
+  height: 106vh;
+  box-shadow: 0px 3px 6px rgba(0,0,0,0.4);
+  background-color: white;
+  z-index:  3000;
+}
+ul.buttons {
+  width: 60px;
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+
+.buttons li {
+  width: 60px;
+  height: 60px;
+  pointer-events: initial;
+  background-color: white;
+  text-decoration: none;
+  border-bottom: 2px sollid #ebebeb;
+  transition: background-color 0.1s ease-out;
+}
+
+/* .buttons li:hovar {
+  background-color: black;
+  transition: background-color 800ms;
+}
+.buttons li:active {
+  background-color: #ebebeb;
+  transition: background-color 800ms;
+} */
+li:hover {
+  background-color: #ebebeb;
+  transition: background-color 0.1s ease-in-out;
+}
+/* li svg{
+  justify-content: center;
+} */
+.active {
+  pointer-events: initial;
+  border-right: 3px solid #FF6009;
+}
+
+.pencilSettings {
+  position: fixed;
+  box-shadow: 0px 3px 6px rgba(0,0,0,0.4);
+  left: 54px;
+  top: -6px;
+  width: 236px;
+  height: 106vh;
+  z-index: 2999;
+  background-color: white;
+}

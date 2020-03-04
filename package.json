@@ -11,7 +11,8 @@
     "test": "webpack",
     "server": "nodemon dist/server.js",
     "tree": "tree -I 'node_modules' .",
-    "t": "yarn test || yarn server"
+    "t": "yarn test || yarn server",
+    "start": "node ./dist/server.js"
   },
   "devDependencies": {
     "@types/body-parser": "^1.19.0",
@@ -21,6 +22,7 @@
     "@types/socket.io": "^2.1.4",
     "@types/socket.io-client": "^1.4.32",
     "css-loader": "^3.4.2",
+    "helmet": "^3.21.3",
     "html-webpack-plugin": "^3.2.0",
     "nodemon": "^2.0.2",
     "nodemon-webpack-plugin": "^4.3.1",
@@ -36,6 +38,9 @@
     "body-parser": "^1.19.0",
     "cookie-parser": "^1.4.4",
     "express": "^4.17.1",
-    "socket.io": "^2.3.0"
+    "socket.io": "^2.3.0",
+    "socket.io-client": "^2.3.0",
+    "socket.io-redis": "^5.2.0",
+    "sticky-session": "^1.1.2"
   }
 }
