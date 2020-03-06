@@ -203,7 +203,7 @@ input[type=range]:focus {
 }
 input[type=range]::-moz-range-thumb{
   -moz-appearance: none;
-  background-color: #ff;
+  background-color: #ffff;
   width: 15px;
   height: 15px;
   border-radius: 50%;
