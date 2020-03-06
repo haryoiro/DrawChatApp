@@ -169,7 +169,7 @@ class Tools extends Application {
         this.eraserToggle = false;
         this.pressureToggle = false;
         // ----- PenSize用プロパティ -----
-        this.defRad = 10;
+        this.defRad = 100;
         this.capStyle = 'round';
         this.joinStyle = 'round';
         this._pinchToggle = false;
@@ -521,6 +521,62 @@ class socketer {
         });
     }
 }
+class Buttons {
+    constructor() {
+        this.pencil = document.querySelector("#pencil");
+        this.eraser = document.querySelector("#eraser");
+        this.fill = document.querySelector("#fill");
+        this.palatte = document.querySelector("#palatte");
+        this.dl = document.querySelector("#download");
+        this.chat = document.querySelector("#textChat");
+        this.pencilSettingWindow = document.querySelector('.pencil-settings');
+        this.eraserSettingWindow = document.querySelector('.eraser-settings');
+        this.chatWindow = document.querySelector('.chat-window')
+    }
+    elementActivate() {
+        this.pencil.addEventListener('click', () => {
+            this.pencil.classList.contains('active') ? this.pencil.classList.contains(' ') : this.pencil.classList.add('active');
+            if (this.pencil.classList.contains('active')) {
+                this.eraser.classList.remove('active');
+                this.fill.classList.remove('active');
+                this.pencil.classList.add('active');
+                view.eraserToggle = false;
+            }
+            this.pencilSettingWindow.classList.toggle('show', true);
+            this.eraserSettingWindow.classList.toggle('show', false);
+            this.chatWindow.classList.toggle('show', false)
+        });
+        this.eraser.addEventListener('click', () => {
+            this.eraser.classList.contains('active') ? this.eraser.classList.contains(' ') : this.eraser.classList.add('active');
+            if (this.eraser.classList.contains('active')) {
+                this.pencil.classList.remove('active');
+                this.fill.classList.remove('active');
+                this.eraser.classList.add('active');
+                view.eraserToggle = true;
+            }
+            this.eraserSettingWindow.classList.toggle('show', true);
+            this.pencilSettingWindow.classList.toggle('show', false);
+            this.chatWindow.classList.toggle('show', false)
+        });
+        this.chat.addEventListener('click', () => {
+            if(this.chat.classList.contains('active')){
+                this.pencil.classList.remove('active')
+                this.fill.classList.remove('active')
+                this.eraser.classList.remove('active')
+            }
+            this.chatWindow.classList.toggle('show', true)
+            this.pencilSettingWindow.classList.toggle('show', false);
+            this.eraserSettingWindow.classList.toggle('show', false);
+        })
+    }
+}
+
+const virtualCanvas = document.createElement('canvas').getContext('2d')
+document.addEventListener('pointermove', (event) => {
+    // virtualCanvas.arc(event.pageX, event.pageY)
+})
+
+
 const canvas = document.querySelector('#canvas');
 const graphic = canvas.getContext('2d');
 const view = new Tools(canvas, graphic);
@@ -529,7 +585,8 @@ const view = new Tools(canvas, graphic);
 view.setUpView(1920, 1080, '#ffffff', true, false);
 const socketInit = new socketer();
 socketInit.pointerAsync();
-console.log(document.querySelector(".buttons").className)
+const domButton = new Buttons();
+domButton.elementActivate();
 const clearButton = document.getElementById('clear');
 (_a = clearButton) === null || _a === void 0 ? void 0 : _a.addEventListener('click', () => {
     view.context2D.clearRect(0, 0, 1920, 1080);

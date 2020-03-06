@@ -1,9 +1,13 @@
+html {
+  width: 0;
+  height: 0;
+}
 *{
   touch-action: none;
   user-select: none;
   pointer-events: none;
-  margin: none;
-  padding: none;
+  margin: 0;
+  padding: 0;
 }
 
 #canvasWrapper {
@@ -43,13 +47,13 @@ div {
   pointer-events: none;
 }
 ul {
-  padding: none;
-  margin: none;
+  padding: 0;
+  margin: 0;
 }
 
 .toolbar {
   left: -6px;
-  top: -6px;
+  top: 0px;
   width: 60px;
   height: 106vh;
   box-shadow: 0px 3px 6px rgba(0,0,0,0.4);
@@ -63,17 +67,20 @@ ul.buttons {
   margin: 0;
 }
 
-
 .buttons li {
   width: 60px;
   height: 60px;
+  margin-top: 0px;
   pointer-events: initial;
   background-color: white;
   text-decoration: none;
   border-bottom: 2px sollid #ebebeb;
   transition: background-color 0.1s ease-out;
 }
-
+.tools svg {
+  transform: scale(0.7, 0.7);
+  padding-left: 3px;
+}
 /* .buttons li:hovar {
   background-color: black;
   transition: background-color 800ms;
@@ -89,18 +96,64 @@ li:hover {
 /* li svg{
   justify-content: center;
 } */
-.active {
+.active svg{
   pointer-events: initial;
-  border-right: 3px solid #FF6009;
+  margin-top: 2px;
+  border-left: 4px solid #FF6009;
 }
 
-.pencilSettings {
+.window {
   position: fixed;
   box-shadow: 0px 3px 6px rgba(0,0,0,0.4);
-  left: 54px;
+  left: -200px;
   top: -6px;
   width: 236px;
   height: 106vh;
   z-index: 2999;
   background-color: white;
+  transition: 0.1s ease-in-out;
+}
+.chat-window {
+  position: fixed;
+  box-shadow: 0px 3px 6px rgba(0,0,0,0.4);
+  left: 54px;
+  top: -6px;
+  width: 396px;
+  height: 106vh;
+  z-index: 2999;
+  background-color: white;
+}
+.chat-window-header {
+  background: #333333;
+  height: 81px;
+  width: 100%;
+}
+.signin{
+  position: fixed;
+  z-index: 3500;
+  left: 322px;
+  top: 20px;
+  width: 98px;
+  height: 32px;
+  background-color: #444444;
+  border: 1px solid #FF6009FF;
+  pointer-events: initial;
+}
+.signin p {
+  color: #EFEFEF;
+  position: initial;
+  text-align: center;
+  padding-top: 8px;
+  font-size: 14px;
+  font: 14px Roboto, Arial, Helvetica, sans-serif;
+}
+
+.signin:hover{
+  background-color: #FF6009FF;
+}
+
+
+.show {
+  left: 54px;
+  transition: 0.1s ease-in-out;
 }

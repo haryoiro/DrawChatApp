@@ -486,35 +486,70 @@ class socketer {
   }
 }
 class Buttons {
-  private pencil = <HTMLElement>document.querySelector("#pencil")
-  private eraser = <HTMLElement>document.querySelector("#eraser")
-  private fill = <HTMLElement>document.querySelector("#pepencil")
-  private palatte = <HTMLElement>document.querySelector("#palatte")
-  private dl = <HTMLElement>document.querySelector("#download")
-  private chat = <HTMLElement>document.querySelector("#chat")
-  private pencilSettingWindow = <HTMLElement>document.querySelector('pencilSetting')
-
-  public elementActivate() {
+  private pencil!: HTMLElement
+  private eraser!: HTMLElement
+  private fill!: HTMLElement
+  private palatte!: HTMLElement
+  private dl!: HTMLElement
+  private chat!: HTMLElement
+  private pencilSettingWindow!: HTMLElement
+  private eraserSettingWindow!: HTMLElement
+  private chatWindow!: HTMLElement
+  constructor() {
+    this.pencil = <HTMLElement>document.querySelector("#pencil");
+    this.eraser = <HTMLElement>document.querySelector("#eraser");
+    this.fill = <HTMLElement>document.querySelector("#fill");
+    this.palatte = <HTMLElement>document.querySelector("#palatte");
+    this.dl = <HTMLElement>document.querySelector("#download");
+    this.chat = <HTMLElement>document.querySelector("#textChat");
+    this.pencilSettingWindow = <HTMLElement>document.querySelector('.pencil-settings');
+    this.eraserSettingWindow = <HTMLElement>document.querySelector('.eraser-settings');
+    this.chatWindow = <HTMLElement>document.querySelector('.chat-window')
+}
+elementActivate() {
     this.pencil.addEventListener('click', () => {
-      if(!this.pencil.classList.contains('active')){
-        this.eraser.classList.remove('active')
-        this.fill.classList.remove('active')
-        this.pencil.classList.add('active')
-        view.eraserToggle = false
-      }else{
-      }
-      this.pencilSettingWindow.classList.toggle('show')
-    })
+        this.pencil.classList.contains('active') ? this.pencil.classList.contains(' ') : this.pencil.classList.add('active');
+        if (this.pencil.classList.contains('active')) {
+            this.eraser.classList.remove('active');
+            this.fill.classList.remove('active');
+            this.pencil.classList.add('active');
+            view.eraserToggle = false;
+        }
+        this.pencilSettingWindow.classList.toggle('show', true);
+        this.eraserSettingWindow.classList.toggle('show', false);
+        this.chatWindow.classList.toggle('show', false)
+    });
     this.eraser.addEventListener('click', () => {
-      if(this.eraser.classList.contains('active')){
-        this.pencil.classList.remove('active')
-        this.fill.classList.remove('active')
-        this.eraser.classList.add('active')
-        
-      }
+        this.eraser.classList.contains('active') ? this.eraser.classList.contains(' ') : this.eraser.classList.add('active');
+        if (this.eraser.classList.contains('active')) {
+            this.pencil.classList.remove('active');
+            this.fill.classList.remove('active');
+            this.eraser.classList.add('active');
+            view.eraserToggle = true;
+        }
+        this.eraserSettingWindow.classList.toggle('show', true);
+        this.pencilSettingWindow.classList.toggle('show', false);
+        this.chatWindow.classList.toggle('show', false)
+    });
+    this.chat.addEventListener('click', () => {
+        if(this.chat.classList.contains('active')){
+            this.pencil.classList.remove('active')
+            this.fill.classList.remove('active')
+            this.eraser.classList.remove('active')
+        }
+        this.chatWindow.classList.toggle('show', true)
+        this.pencilSettingWindow.classList.toggle('show', false);
+        this.eraserSettingWindow.classList.toggle('show', false);
     })
   }
 }
+
+
+const virtualCanvas = <CanvasRenderingContext2D>document.createElement('canvas').getContext('2d')
+document.addEventListener('pointermove', (event: PointerEvent) => {
+    // virtualCanvas.arc(event.pageX, event.pageY)
+})
+
 
 const canvas = <HTMLCanvasElement>document.querySelector('#canvas');
 const graphic = <CanvasRenderingContext2D>canvas.getContext('2d');
@@ -533,9 +568,9 @@ const domButton = new Buttons()
 domButton.elementActivate()
 
 
-const clearButton = document.getElementById('clear')
-clearButton?.addEventListener('click', () => {
-  view.context2D.clearRect(0, 0, 1920, 1080)
-  socket.emit('clear')
-})
+// const clearButton = document.getElementById('clear')
+// clearButton?.addEventListener('click', () => {
+//   view.context2D.clearRect(0, 0, 1920, 1080)
+//   socket.emit('clear')
+// })
 
