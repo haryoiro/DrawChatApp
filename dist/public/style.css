@@ -214,7 +214,7 @@ input[type=range]::-moz-range-thumb{
 }
 input[type=range]::-webkit-slider-thumb{
   -webkit-appearance: none;
-  background-color: #ff;
+  background-color: #ffff;
   width: 15px;
   height: 15px;
   border-radius: 50%;
@@ -235,7 +235,7 @@ input[type=range]::-ms-thumb {
   transition: .3s ease-in-out;
 }
 
-input[type=range]::-moz-range-thumb:hover{ 
+input[type=range]::-moz-range-thumb:hover{
   box-shadow: 0 0 0 10px rgba(0, 0, 0, 57);
 }
 input[type=range]::-webkit-slider-thumb:hover{
