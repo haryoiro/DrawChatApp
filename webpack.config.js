@@ -21,15 +21,17 @@ const clientConfig = {
       exclude: /node_modules/,
     },{
       test: /\.css$/,
-      loaders: ['style-loader', 'css-loader?modules']
+      loaders: ['style-loader', 'css-loader']
     }]
   },
   resolve: {
-    extensions: [".ts", ".tsx", ".js", ".jsx"]
+    extensions: [".ts", ".tsx", ".js", ".jsx", ".css", ".html"]
   },
   plugins: [
     new HtmlWebpackPlugin({
       template: "./src/public/index.html"
+    }),
+    new NodemonPlugin({
     })
   ]
 }
@@ -58,10 +60,11 @@ const serverConfig = {
     }]
   },
   plugins: [
-    new NodemonPlugin()
+    new NodemonPlugin({
+    })
   ],
   resolve: {
-    extensions: [".ts", ".js"]
+    extensions: [".ts", ".tsx", ".js", ".jsx", ".css", ".html"]
   }
 }
 

@@ -140,7 +140,7 @@ app.get("/", (req, res) => {
 });
 let canvasArr = [];
 let playerArr = [];
-const allCanvasStack = (points) => {
+const pointsStack = (points) => {
     canvasArr.push(points);
 };
 const clearAllCanvas = () => {
@@ -167,14 +167,14 @@ io.on('connection', (socket) => {
         io.sockets.emit('chat', data);
     });
     socket.on('point', (points) => {
-        allCanvasStack(points);
+        pointsStack(points);
         socket.broadcast.emit('point', points);
     });
     socket.on('disconnect', (socket) => {
         playerArr.splice(playerArr.indexOf(socket.id), 1);
         console.log('socket disconnection', socket.id);
     });
-    setInterval(() => { socket.emit('clearAll'); }, 30000);
+    // setInterval(()=>{socket.emit('clearAll')},30000)
 });
 server.listen(port, () => {
     console.log(`listening to requests on port: ${port}`);

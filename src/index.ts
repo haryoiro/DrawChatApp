@@ -42,9 +42,10 @@ app.get("/", (req, res) => {
   })
 });
 
+
 let canvasArr: any[] = []
 let playerArr: any[] = []
-const allCanvasStack = (points: any)  => {
+const pointsStack = (points: any)  => {
   canvasArr.push(points)
 }
 const clearAllCanvas = () => {
@@ -75,7 +76,7 @@ io.on('connection', (socket: any): void=> {
   })
 
   socket.on('point',(points: any): void => {
-    allCanvasStack(points)
+    pointsStack(points)
     socket.broadcast.emit('point', points)
   })
 
@@ -84,7 +85,7 @@ io.on('connection', (socket: any): void=> {
       playerArr.indexOf(socket.id), 1)
     console.log('socket disconnection', socket.id)
   })
-  setInterval(()=>{socket.emit('clearAll')},30000)
+  // setInterval(()=>{socket.emit('clearAll')},30000)
 })
 
 
