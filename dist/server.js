@@ -110,7 +110,6 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-// const helmet = require("helmet")
 const port = process.env.PORT || 5000;
 // app setup
 const app = express__WEBPACK_IMPORTED_MODULE_0___default()();
@@ -138,14 +137,6 @@ app.get("/", (req, res) => {
         res.writeHead(200);
     });
 });
-let canvasArr = [];
-let playerArr = [];
-const pointsStack = (points) => {
-    canvasArr.push(points);
-};
-const clearAllCanvas = () => {
-    canvasArr = [];
-};
 // ---- - Socket.IO -----
 const socketOption = {
     cookie: false,
@@ -154,25 +145,58 @@ const socketOption = {
 };
 // import socketio from "socket.io"
 const socket = __webpack_require__(/*! socket.io */ "socket.io");
-const io = socket(server, socketOption);
-// const io : socketio.Server = socketio(server).listen()
+// const io = socket(server, socketOption)
+const io = socket(server);
+let canvasArr = [];
+let playerArr = [];
+const pointsStack = (points) => {
+    canvasArr.push(points);
+};
+const clearAllCanvas = () => {
+    canvasArr = [];
+};
+class SocketMapHandler {
+    constructor(map) {
+        this.map = map;
+        this.nowTime = () => new Date();
+        this.setSocketId = (socketId) => this.map.set(socketId, this.nowTime());
+        this.hasSocketId = (socketId) => this.map.has(socketId);
+        this.getSocketId = (socketId) => this.map.get(socketId);
+        this.deleteSocketId = (socketId) => this.hasSocketId(socketId) ? this.map.delete(socketId) : void 0;
+        this.map = map;
+    }
+}
+const canvasPointsMap = new Map();
+const hasOnPoints = (map, socketId, points) => map.has(points) || points !== null ? true : false;
+const setOnPoints = (map, socketId, pointsArr) => hasOnPoints(map, socketId, pointsArr) ? void 0 : map.set(socketId, pointsArr);
+const deleteOnPoints = (map, socketId, pointsArr) => { hasOnPoints(map, socketId, pointsArr) ? void 0 : map.delete(pointsArr); };
+const socketsIdMap = new Map(); //ユーザーIDをすべて入れるMapオブジェクト
+const sUser = new SocketMapHandler(socketsIdMap);
 // io.adapter(redis({host: "127.0.0.1", port: 5000}))
-io.on('connection', (socket) => {
-    console.log('made socket conenction', socket.id);
-    playerArr = [...playerArr, socket.id];
-    socket.emit('allCanvas', canvasArr);
-    console.log(playerArr);
-    console.log(`now Player: ${playerArr.length}`);
+io.sockets.on('connection', (socket) => {
+    sUser.setSocketId(socket.id);
+    console.log(`socket connected: ${socket.id} :: ${sUser.getSocketId(socket.id)}`);
+    console.log(`now Player: ${socketsIdMap.size}`);
+    console.log(socketsIdMap);
+    socket.on('firstConnect', (socketId) => {
+        socket.emit('allCanvas', canvasArr);
+        io.to(socketId).emit('s_to_c_id', { id: socketId });
+    });
     socket.on('chat', (data) => {
         io.sockets.emit('chat', data);
     });
     socket.on('point', (points) => {
-        pointsStack(points);
+        canvasArr.push(points);
+        // console.log(points)
         socket.broadcast.emit('point', points);
     });
     socket.on('disconnect', (socket) => {
-        playerArr.splice(playerArr.indexOf(socket.id), 1);
-        console.log('socket disconnection', socket.id);
+        console.log(socket.id);
+        if (sUser.hasSocketId(socket.id)) {
+            console.log('socket disconnection', socket.id);
+            io.socket.emit('userDisconnect', socket.id);
+            sUser.deleteSocketId(socket.id);
+        }
     });
     // setInterval(()=>{socket.emit('clearAll')},30000)
 });

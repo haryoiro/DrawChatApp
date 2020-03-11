@@ -1,3 +1,5 @@
+import e from "express"
+
 export default class Buttons {
   private barg!: HTMLElement
   private pencil!: HTMLElement
@@ -11,6 +13,9 @@ export default class Buttons {
   private chatWindow!: HTMLElement
 
   private sliders!: any
+  private penSizeText!: HTMLElement
+  private eraSizeText!: HTMLElement
+  private fillSizeText!: HTMLElement
   constructor(public view: any) {
     this.view = view
     this.barg = <HTMLElement>document.querySelector('#barg')
@@ -24,22 +29,32 @@ export default class Buttons {
     this.eraserSettingWindow = <HTMLElement>document.querySelector('.eraser-settings');
     this.chatWindow = <HTMLElement>document.querySelector('.chat-window')
     this.sliders = document.getElementsByTagName('input')
+    this.penSizeText = <HTMLElement>document.querySelector(".pen-size-text")
+    this.eraSizeText = <HTMLElement>document.querySelector(".era-size-text")
+    this.fillSizeText = <HTMLElement>document.querySelector(".fill-size-text")
   }
   private sliderElementSetup(){
-    let penSize = this.sliders[0],
+    const penSize = this.sliders[0],
       penAlpha = this.sliders[1],
       penSmooth = this.sliders[2],
       eraSize = this.sliders[3],
       eraAplha = this.sliders[4],
       eraSmooth = this.sliders[5]
-    penSize.addEventListener('input', () => {
+    penSize.addEventListener('input', (e: Event) => {
+      e.preventDefault()
+      this.penSizeText.innerText = penSize.value
       this.view.penRadius = parseInt(penSize.value, 10)
     })
-    eraSize.addEventListener('input', () => {this.view.eraRadius = parseInt(eraSize.value, 10)})
+    eraSize.addEventListener('input', (e: Event) => {
+      this.eraSizeText.innerText = eraSize.value
+      e.preventDefault();
+      this.view.eraRadius = parseInt(eraSize.value, 10)
+    })
   }
   public elementActivate() {
     this.sliderElementSetup()
-    this.barg.addEventListener('click', () => {
+    this.barg.addEventListener('click', (e: Event) => {
+      e.preventDefault()
       this.pencilSettingWindow.classList.toggle('show', false);
       this.eraserSettingWindow.classList.toggle('show', false);
       this.chatWindow.classList.toggle('show', false)

@@ -12,7 +12,7 @@
     "tree": "tree -I 'node_modules' .",
     "server": "node ./dist/server.js",
     "t": "yarn server",
-    "nodemon": "yarn server || nodemon"
+    "start": "yarn server"
   },
   "devDependencies": {
     "@types/body-parser": "^1.19.0",
@@ -42,8 +42,6 @@
     "cookie-parser": "^1.4.4",
     "express": "^4.17.1",
     "socket.io": "^2.3.0",
-    "socket.io-client": "^2.3.0",
-    "socket.io-redis": "^5.2.0",
-    "sticky-session": "^1.1.2"
+    "socket.io-client": "^2.3.0"
   }
 }

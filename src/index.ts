@@ -3,9 +3,8 @@ import http from "http"
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import path from "path"
-import { futimesSync } from "fs";
-import { resolve } from "dns";
-// const helmet = require("helmet")
+import { Socket } from "net";
+import { stringify } from "querystring";
 
 const port = process.env.PORT || 5000
 
@@ -42,15 +41,6 @@ app.get("/", (req, res) => {
   })
 });
 
-
-let canvasArr: any[] = []
-let playerArr: any[] = []
-const pointsStack = (points: any)  => {
-  canvasArr.push(points)
-}
-const clearAllCanvas = () => {
-  canvasArr = []
-}
 // ---- - Socket.IO -----
 const socketOption = {
   cookie: false,
@@ -60,30 +50,63 @@ const socketOption = {
 // import socketio from "socket.io"
 const socket = require('socket.io')
 const io = socket(server, socketOption)
-// const io : socketio.Server = socketio(server).listen()
+// const io = socket(server)
 
 
-// io.adapter(redis({host: "127.0.0.1", port: 5000}))
-io.on('connection', (socket: any): void=> {
-  console.log('made socket conenction', socket.id)
-  playerArr = [...playerArr, socket.id]
-  socket.emit('allCanvas', canvasArr)
-  console.log(playerArr)
-  console.log(`now Player: ${playerArr.length}`)
+let canvasArr: any[] = []
+const pointsStack = (points: any)  => {
+  canvasArr.push(points)
+}
+const clearAllCanvas = () => {
+  canvasArr = []
+}
+class SocketMapHandler {
+  public map: Map<string, Date>
+  constructor(){
+    this.map =  new Map<string, Date>()
+  }
+  public nowTime = () => new Date()
+  public setSocketId = (socketId: string) => this.map.set(socketId, this.nowTime())
+  public hasSocketId = (socketId: string) => this.map.has(socketId)
+  public getSocketId = (socketId: string) => this.map.get(socketId)
+  public deleteSocketId = (socketId: string) => this.hasSocketId(socketId) ? this.map.delete(socketId) : void 0
+}
+const canvasPointsMap = new Map<string, any>()
+const hasOnPoints = (map: Map<string, any>, socketId: string, points:any) => map.has(points) || points !== null ? true : false
+const setOnPoints = (map: Map<string, any>, socketId: string, pointsArr: any) => hasOnPoints(map, socketId, pointsArr) ? void 0 : map.set(socketId, pointsArr)
+const deleteOnPoints = (map: Map<string, any>, socketId: string, pointsArr: any) => {hasOnPoints(map, socketId, pointsArr) ? void 0 : map.delete(pointsArr)}
+
+
+
+const sUser = new SocketMapHandler()
+io.sockets.on('connection',  (socket: any) => {
+  sUser.setSocketId(socket.id)
+  console.log(`socket connected: ${socket.id} :: ${sUser.getSocketId(socket.id)}`)
+  console.log(`now Player: ${sUser.map.size}`)
+  console.log(sUser.map)
+
+  socket.on('firstConnect', (socketId: any) => {
+    socket.emit('allCanvas', canvasArr)
+    io.to(socketId).emit('s_to_c_id', {id: socketId})
+  })
 
   socket.on('chat', (data: any): void=> {
     io.sockets.emit('chat', data)
   })
 
   socket.on('point',(points: any): void => {
-    pointsStack(points)
+    canvasArr.push(points)
+    // console.log(points)
     socket.broadcast.emit('point', points)
   })
 
   socket.on('disconnect', (socket: any): void => {
-    playerArr.splice(
-      playerArr.indexOf(socket.id), 1)
-    console.log('socket disconnection', socket.id)
+    console.log(socket.id)
+    if(sUser.hasSocketId(socket.id)){
+      console.log('socket disconnection', socket.id)
+      io.socket.emit('userDisconnect', socket.id)
+      sUser.deleteSocketId(socket.id)
+    }
   })
   // setInterval(()=>{socket.emit('clearAll')},30000)
 })

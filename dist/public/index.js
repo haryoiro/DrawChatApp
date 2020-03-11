@@ -111,17 +111,27 @@ class Buttons {
         this.eraserSettingWindow = document.querySelector('.eraser-settings');
         this.chatWindow = document.querySelector('.chat-window');
         this.sliders = document.getElementsByTagName('input');
+        this.penSizeText = document.querySelector(".pen-size-text");
+        this.eraSizeText = document.querySelector(".era-size-text");
+        this.fillSizeText = document.querySelector(".fill-size-text");
     }
     sliderElementSetup() {
-        let penSize = this.sliders[0], penAlpha = this.sliders[1], penSmooth = this.sliders[2], eraSize = this.sliders[3], eraAplha = this.sliders[4], eraSmooth = this.sliders[5];
-        penSize.addEventListener('input', () => {
+        const penSize = this.sliders[0], penAlpha = this.sliders[1], penSmooth = this.sliders[2], eraSize = this.sliders[3], eraAplha = this.sliders[4], eraSmooth = this.sliders[5];
+        penSize.addEventListener('input', (e) => {
+            e.preventDefault();
+            this.penSizeText.innerText = penSize.value;
             this.view.penRadius = parseInt(penSize.value, 10);
         });
-        eraSize.addEventListener('input', () => { this.view.eraRadius = parseInt(eraSize.value, 10); });
+        eraSize.addEventListener('input', (e) => {
+            this.eraSizeText.innerText = eraSize.value;
+            e.preventDefault();
+            this.view.eraRadius = parseInt(eraSize.value, 10);
+        });
     }
     elementActivate() {
         this.sliderElementSetup();
-        this.barg.addEventListener('click', () => {
+        this.barg.addEventListener('click', (e) => {
+            e.preventDefault();
             this.pencilSettingWindow.classList.toggle('show', false);
             this.eraserSettingWindow.classList.toggle('show', false);
             this.chatWindow.classList.toggle('show', false);
@@ -184,12 +194,13 @@ class Buttons {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Tools; });
 /* harmony import */ var _UI__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./UI */ "./src/public/UI.ts");
+// import io from "socket.io-client"
 const socketOption = {
     reconnectionDelay: 50000,
     transports: ['websocket', 'polling']
 };
-// const socket = io("http://localhost", socketOption)
-const socket = io("https://app-drawn.herokuapp.com", socketOption);
+const socket = io("http://localhost:5000");
+// const socket = io("https://app-drawn.herokuapp.com", socketOption)
 
 class Application {
     constructor(canvas, context2D) {
@@ -197,6 +208,7 @@ class Application {
         this.context2D = context2D;
         this.canvas = canvas;
         this.context2D = context2D;
+        this._dpr = window.devicePixelRatio || 1;
     }
     setUpView(width, height, color, hide = false, smooth = false) {
         this._settingCanvasSize(width, height);
@@ -205,6 +217,8 @@ class Application {
         this._isImageSmoothing(smooth);
     }
     _settingCanvasSize(width, height) {
+        this.canvas.style.width = `${width / this._dpr}px`;
+        this.canvas.style.height = `${height / this._dpr}px`;
         this.canvas.width = width;
         this.canvas.height = height;
     }
@@ -250,6 +264,8 @@ class Tools extends Application {
         this.pressureToggle = false;
         // ----- PenSize用プロパティ -----
         this.defRad = 10;
+        this.penRadius = 10;
+        this.eraRadius = 10;
         this.capStyle = 'round';
         this.joinStyle = 'round';
         this._pinchToggle = false;
@@ -262,10 +278,10 @@ class Tools extends Application {
     }
     eventActivation() {
         if (window.PointerEvent) {
-            this.canvas.addEventListener('pointerdown', (event) => this.downPointerController(event), { passive: false, });
-            this.canvas.addEventListener('pointerup', (event) => this.upPointerController(event), { passive: false, });
-            this.canvas.addEventListener('pointermove', (event) => this.movePointerController(event), { passive: false, });
-            this.canvas.addEventListener('pointercancel', (event) => this.leavePointerHandler(event), { passive: false, });
+            this.canvas.addEventListener('pointerdown', (event) => { event.preventDefault(); this.downPointerController(event); }, { passive: false, });
+            this.canvas.addEventListener('pointerup', (event) => { event.preventDefault(); this.upPointerController(event); }, { passive: false, });
+            this.canvas.addEventListener('pointermove', (event) => { event.preventDefault(); this.movePointerController(event); }, { passive: false, });
+            this.canvas.addEventListener('pointercancel', (event) => { event.preventDefault(); this.leavePointerHandler(event); }, { passive: false, });
             document.addEventListener('wheel', (event) => {
                 event.preventDefault();
                 this.nowR ? this.nowR : this.nowR = 1;
@@ -279,9 +295,9 @@ class Tools extends Application {
                 }
                 this._pinchHandle(event);
             }, { passive: false, });
-            // this.canvas.addEventListener('pointerleave', event => this.leavePointerHandler(event), {
-            //   passive: false,
-            // });
+            document.addEventListener('pointerleave', event => this.leavePointerHandler(event), {
+                passive: false,
+            });
             document.addEventListener('pointerout', (event) => this.leavePointerHandler(event), { passive: false, });
         }
         else {
@@ -317,7 +333,15 @@ class Tools extends Application {
     }
     upPointerController(event) {
         event.preventDefault();
-        this.pointerSwitcher(event, this.handlePenUp(event), this.handleTouchUp(event), this.handleMouseUp(event));
+        if (eventStack) {
+            this._removeEventStack(event);
+        }
+        this.drawToggle = false;
+        this.emitStack.push({ color: this.canvasColor, cap: this.capStyle, join: this.joinStyle, erase: this.eraserToggle });
+        this.emitPoint(this.emitStack);
+        this.emitStack = [];
+        this.context2D.beginPath();
+        this.drawToggle = false;
     }
     // ---- PointerEvents ---
     // *------- DOWN -------
@@ -355,19 +379,23 @@ class Tools extends Application {
     handlePenMove(event) {
         event.preventDefault();
         if (this.drawToggle) {
+            this.eraseTool();
             this.context2D.lineWidth = this.initializePressure(event);
             this.pencilTool(event);
-            this.stackPoint(this._pressurePoints(event));
+            this.stackPoint(this._pressurePoints(event, this.initializePressure(event)));
         }
     }
+    // *-- MouseMove if PointerEvent
     handleMouseMove(event) {
         event.preventDefault();
         if (this.drawToggle) {
+            this.eraseTool();
             this.context2D.lineWidth = this.initializePressure(event);
             this.pencilTool(event);
-            this.stackPoint(this._pressurePoints(event));
+            this.stackPoint(this._pressurePoints(event, this.initializePressure(event)));
         }
     }
+    // *-- TouchMove if PointerEvent
     handleTouchMove(event) {
         event.preventDefault();
         for (let i = 0; i < eventStack.length; i++) {
@@ -381,11 +409,10 @@ class Tools extends Application {
         }
         this.p1 = eventStack[0];
         if (eventStack.length < 1 && this.drawToggle) {
-            this.context2D.lineWidth = this.initializePressure(event);
             this.eraseTool();
-            this.settingPenConf(this.canvasColor, this.capStyle, this.joinStyle);
-            this.drawLine(event.offsetX, event.offsetY);
-            this.stackPoint(this._pressurePoints(event));
+            this.context2D.lineWidth = this.initializePressure(event);
+            this.pencilTool(event);
+            this.stackPoint(this._pressurePoints(event, this.initializePressure(event)));
         }
         if (eventStack.length >= 2) {
             this.p2 = eventStack[1];
@@ -398,38 +425,10 @@ class Tools extends Application {
         this._pinchHandle(event);
     }
     // ---- PointerEvents ---
-    // *--------  UP  --------
-    handlePenUp(event) {
-        event.preventDefault();
-        this.drawToggle = false;
-        this.emitStack.push({ color: this.canvasColor, cap: this.capStyle, join: this.joinStyle, erase: this.eraserToggle, width: this.initializePressure(event) });
-        this.emitPoint(this.emitStack);
-        this.emitStack = [];
-        this.context2D.beginPath();
-    }
-    handleTouchUp(event) {
-        event.preventDefault();
-        this.drawToggle = false;
-        this.emitStack.push({ color: this.canvasColor, cap: this.capStyle, join: this.joinStyle, erase: this.eraserToggle, width: this.initializePressure(event) });
-        this.emitPoint(this.emitStack);
-        this.emitStack = [];
-        this.context2D.beginPath();
-        this._removeEventStack(event);
-    }
-    handleMouseUp(event) {
-        event.preventDefault();
-        this.drawToggle = false;
-        this.emitStack.push({ color: this.canvasColor, cap: this.capStyle, join: this.joinStyle, erase: this.eraserToggle, width: this.initializePressure(event) });
-        this.emitPoint(this.emitStack);
-        this.emitStack = [];
-        this.context2D.beginPath();
-    }
-    // ---- PointerEvents ---
     // *------- LEAVE -------
     leavePointerHandler(event) {
-        event.preventDefault();
+        this._removeEventStack(event);
         this.context2D.beginPath();
-        this.drawToggle = false;
     }
     // ---- MouseEvents ----
     // *-- LEGACY EVENTS --
@@ -438,11 +437,12 @@ class Tools extends Application {
         this.drawToggle = true;
     }
     moveMouseHandler(event) {
-        event.preventDefault;
+        event.preventDefault();
         if (this.drawToggle) {
+            this.eraseTool();
             this.context2D.lineWidth = this.initializePressure({ pressure: 0.5 });
             this.pencilTool(event);
-            this.stackPoint(this._simplePoints(event, 0.5));
+            this.stackPoint(this._simplePoints(event, this.initializePressure({ pressure: 0.5 })));
         }
     }
     upMouseHandler(event) {
@@ -456,7 +456,6 @@ class Tools extends Application {
     }
     // ---- PencilTools ----
     pencilTool(event) {
-        this.eraseTool();
         this.settingPenConf(this.canvasColor, this.capStyle, this.joinStyle);
         this.drawLine(event.offsetX, event.offsetY);
     }
@@ -473,14 +472,14 @@ class Tools extends Application {
         this.context2D.moveTo(x, y);
     }
     eraseTool() {
-        if (this.eraserToggle) {
-            this.defRad = this.eraRadius;
-            this.context2D.globalCompositeOperation = 'destination-out';
-        }
-        else {
-            this.defRad = this.penRadius;
-            this.context2D.globalCompositeOperation = 'source-over';
-        }
+        this.eraserToggle
+            ? this.context2D.globalCompositeOperation = 'destination-out'
+            : this.context2D.globalCompositeOperation = 'source-over';
+    }
+    eraOrPenSize() {
+        this.eraserToggle
+            ? this.defRad = this.eraRadius
+            : this.defRad = this.penRadius;
     }
     setPencilColor(color) {
         this.canvasColor = color;
@@ -492,18 +491,18 @@ class Tools extends Application {
     }
     // 異常な筆圧値を丸める、筆圧によりペンのサイズを漸強/漸弱させる
     initializePressure(event) {
-        this.eraseTool();
-        if (event.pressure < 0.995 || event.pressure > 0.05) {
+        this.eraOrPenSize();
+        if (event.pressure < 0.995 || event.pressure > 0.05) { // 標準的筆圧の場合は一定の処理
             event.pressure ? (this.defRad *= event.pressure) : (this.defRad /= event.pressure);
             return this.defRad;
         }
-        else if (event.pressure <= 0.05 || event.pressure > 0.01) {
+        else if (event.pressure <= 0.05 || event.pressure > 0.01) { //  筆圧が弱すぎる場合は最低限の筆圧で処理
             return this.defRad *= 0.05;
         }
-        else if (event.pressure >= 0.995) {
+        else if (event.pressure >= 0.995) { // 筆圧が強すぎる場合最大値の筆圧で処理
             return this.defRad *= 0.995;
         }
-        else {
+        else { // 筆圧に対応していない場合は0.5で処理
             return this.defRad *= 0.5;
         }
     }
@@ -539,11 +538,11 @@ class Tools extends Application {
         //@ts-ignore
         style.msTransform = scale;
     }
-    _pressurePoints(event) {
-        return { X: event.offsetX, Y: event.offsetY, pressure: this.initializePressure(event) };
+    _pressurePoints(event, num) {
+        return { X: event.offsetX, Y: event.offsetY, p: num };
     }
-    _simplePoints(event, number) {
-        return { X: event.offsetX, Y: event.offsetY, pressure: this.initializePressure({ pressure: number }) };
+    _simplePoints(event, num) {
+        return { X: event.offsetX, Y: event.offsetY, p: num };
     }
     abs(number) {
         return (number * number) / 2;
@@ -555,7 +554,6 @@ class Tools extends Application {
         this.emitStack.push(pointObj);
     }
     emitPoint(pointObj) {
-        this.emitStack.splice(0, 1);
         socket.emit('point', pointObj);
     }
 }
@@ -563,36 +561,30 @@ class socketer {
     constructor() {
     }
     pointerAsync() {
-        socket.on('allCanvas', (canvas) => {
-            for (let o in canvas) {
-                let points = canvas[o];
-                for (let i in points) {
-                    console.log(points);
-                    view.settingPenConf(points[i][points[i].length - 1].color, points[i][points[i].length - 1].cap, points[i][points[i].length - 1].join);
-                    if (points[i][points.length - 1].erase) {
-                        view.context2D.globalCompositeOperation = 'destination-out';
-                    }
-                    else {
-                        view.context2D.globalCompositeOperation = 'source-over';
-                    }
-                    view.context2D.lineWidth = points[i].pressure;
-                    view.drawLine(points[i].X, points[i].Y);
+        socket.on('allCanvas', (c) => {
+            for (let o in c) {
+                let p = c[o];
+                view.settingPenConf(p[p.length - 1].color, p[p.length - 1].cap, p[p.length - 1].join);
+                p[p.length - 1].erase
+                    ? view.context2D.globalCompositeOperation = 'destination-out'
+                    : view.context2D.globalCompositeOperation = 'source-over';
+                for (let i in p) {
+                    view.context2D.lineWidth = p[i].p;
+                    view.drawLine(p[i].X, p[i].Y);
                 }
-                view.context2D.beginPath();
                 view.eraseTool();
+                view.context2D.beginPath();
             }
         });
-        socket.on('point', (points) => {
-            view.settingPenConf(points[points.length - 1].color, points[points.length - 1].cap, points[points.length - 1].join);
-            if (points[points.length - 1].erase) {
-                view.context2D.globalCompositeOperation = 'destination-out';
-            }
-            else {
-                view.context2D.globalCompositeOperation = 'source-over';
-            }
-            for (let i in points) {
-                view.context2D.lineWidth = points[i].pressure;
-                view.drawLine(points[i].X, points[i].Y);
+        socket.on('point', (p) => {
+            view.settingPenConf(p[p.length - 1].color, p[p.length - 1].cap, p[p.length - 1].join);
+            p[p.length - 1].erase
+                ? view.context2D.globalCompositeOperation = 'destination-out'
+                : view.context2D.globalCompositeOperation = 'source-over';
+            console.log(p);
+            for (let i in p) {
+                view.context2D.lineWidth = p[i].p;
+                view.drawLine(p[i].X, p[i].Y);
             }
             view.eraseTool();
             view.context2D.beginPath();
@@ -602,25 +594,24 @@ class socketer {
         });
     }
 }
-// const virtualCanvas = <CanvasRenderingContext2D>document.createElement('canvas').getContext('2d')
-// document.addEventListener('pointermove', (event: PointerEvent) => {
-//     // virtualCanvas.arc(event.pageX, event.pageY)
-// })
 const canvas = document.querySelector('#canvas');
 const graphic = canvas.getContext('2d');
 const view = new Tools(canvas, graphic);
-// Application.prototype.serUpView
-//    (context , backgroundColor, hideMenu, smoothRendering)
-view.setUpView(1920, 1080, '#ffffff', true, false);
-const socketInit = new socketer();
-socketInit.pointerAsync();
-const domButton = new _UI__WEBPACK_IMPORTED_MODULE_0__["default"](view);
-domButton.elementActivate();
-// const clearButton = document.getElementById('clear')
-// clearButton?.addEventListener('click', () => {
-//   view.context2D.clearRect(0, 0, 1920, 1080)
-//   socket.emit('clear')
-// })
+(window.addEventListener('load', () => {
+    let myId;
+    // Application.prototype.serUpView
+    //    (context , backgroundColor, hideMenu, smoothRendering)
+    view.setUpView(3840, 2160, '#ffffff', true, true);
+    const socketInit = new socketer();
+    socketInit.pointerAsync();
+    const domButton = new _UI__WEBPACK_IMPORTED_MODULE_0__["default"](view);
+    domButton.elementActivate();
+    socket.emit('firstConnect', socket.id);
+    socket.on('s_to_c_id', (id) => {
+        myId = id;
+        console.log(myId);
+    });
+}));
 
 
 /***/ })
