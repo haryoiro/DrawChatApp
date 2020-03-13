@@ -18,10 +18,10 @@ jobs:
     executor: heroku/default
     steps:
       - checkout
+      - heroku/install
       - run:
           name: Setup Heroku
           command: bash .circleci/setup-heroku.sh
-      - heroku/install
       - run:
           name: deploy to heroku
           command:  |
