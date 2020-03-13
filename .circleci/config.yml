@@ -1,0 +1,47 @@
+version: 2.1
+
+orbs:
+  heroku: circleci/heroku@1.0.1
+
+workflows:
+  heroku_deploy:
+    jobs:
+      - build
+      - deploy:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
+jobs:
+  deploy:
+    executor: heroku/default
+    steps:
+      - checkout
+      - run:
+          name: Setup Heroku
+          command: bash .circleci/setup-heroku.sh
+      - heroku/install
+      - run:
+          name: deploy to heroku
+          command:  |
+            git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git master
+      - heroku/deploy-via-git
+  build:
+    docker:
+      - image: circleci/node:12.13-stretch-browsers
+    working_directory: ~/app-drawn
+    steps:
+      - checkout
+      
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "yarn.lock" }}
+            - v1-dependencies-
+      - run: yarn install
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "yarn.lock" }}
+      - run: yarn build
+        
