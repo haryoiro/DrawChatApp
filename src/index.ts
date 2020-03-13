@@ -3,8 +3,6 @@ import http from "http"
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import path from "path"
-import { Socket } from "net";
-import { stringify } from "querystring";
 
 const port = process.env.PORT || 5000
 
