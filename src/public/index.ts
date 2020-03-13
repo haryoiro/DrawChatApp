@@ -48,8 +48,8 @@ class Application{
     if(bool){
       document.addEventListener('contextmenu', e => e.preventDefault());
       document.addEventListener('MSHoldVisal', e => e.preventDefault());
-      document.getElemetnById('#canvasWrapper')?.addEventListener('contextmenu', (e: any) => e.preventDefault())
-      document.getElemetnById('#canvasWrapper')?.addEventListener('MSHoldVisal', (e: any) => e.preventDefault())
+      document.getElementById('#canvasWrapper')?.addEventListener('contextmenu', (e: any) => e.preventDefault())
+      document.getElementById('#canvasWrapper')?.addEventListener('MSHoldVisal', (e: any) => e.preventDefault())
     }
   }
   private _isImageSmoothing(bool: boolean): void {
