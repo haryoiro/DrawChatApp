@@ -6,10 +6,17 @@ orbs:
 workflows:
   heroku_deploy:
     jobs:
-      - deploy-prod
+      - build
+      - deploy:
+        requires:
+          - build
+        filters:
+          branches:
+            only: master
 jobs:
   deploy:
-    executor: heroku/default
+    docker:
+      - image: circleci/node:12.13-stretch-browsers
     steps:
       - checkout
       - heroku/install
@@ -18,21 +25,6 @@ jobs:
         command: bash .circleci/setup-heroku.sh
       - heroku/deploy-via-git:
         only-branch: master
-  deploy-prod:
-    executor: heroku/default
-    steps:
-      - checkout
-      - heroku/install
-      - run:
-        name: heroku maintenance on
-        command: heroku maintenance:on --app ${HEROKU_APP_NAME}
-      - run:
-        name: heroku deploy
-        command: |
-          git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git master
-      - run:
-        name: heroku maintenance off
-        command: heroku maintenance:off --app ${HEROKU_APP_NAME}
   build:
     docker:
       - image: circleci/node:12.13-stretch-browsers
@@ -48,4 +40,3 @@ jobs:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "yarn.lock" }}
-      - run: yarn build
