@@ -19,9 +19,15 @@ const clientConfig = {
       test: /\.tsx?$/,
       use: "ts-loader",
       exclude: /node_modules/,
-    },{
+    },
+    {
       test: /\.css$/,
-      loaders: ['style-loader', 'css-loader']
+      use: [
+        'style-loader',
+        'css-loader',
+        'postcss-loader',
+        'sass-loader'
+      ]
     }]
   },
   resolve: {
@@ -40,7 +46,7 @@ const serverConfig = {
   mode: "development", // <- 圧縮無効 早い
   // mode: "production", // <- 圧縮有効 遅い
   devtool: "production",
-  entry: "./src/index.ts",
+  entry: "./src/server.ts",
   output: {
     filename: `server.js`,
     path: `${__dirname}/dist`

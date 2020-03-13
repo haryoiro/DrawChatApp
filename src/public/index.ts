@@ -1,4 +1,6 @@
 // import io from "socket.io-client"
+import './style.css'
+import Buttons from './UI'
 
 const socketOption = {
   reconnectionDelay: 50000,
@@ -8,7 +10,6 @@ const socketOption = {
 // const socket = io("http://localhost:5000")
 const socket = io("https://app-drawn.herokuapp.com", socketOption)
 
-import Buttons from './UI'
 class Application{
   private _width!: number
   private _height!: number

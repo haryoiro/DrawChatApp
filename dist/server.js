@@ -81,15 +81,15 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = "./src/index.ts");
+/******/ 	return __webpack_require__(__webpack_require__.s = "./src/server.ts");
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ "./src/index.ts":
-/*!**********************!*\
-  !*** ./src/index.ts ***!
-  \**********************/
+/***/ "./src/server.ts":
+/*!***********************!*\
+  !*** ./src/server.ts ***!
+  \***********************/
 /*! no exports provided */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -145,43 +145,34 @@ const socketOption = {
 };
 // import socketio from "socket.io"
 const socket = __webpack_require__(/*! socket.io */ "socket.io");
-// const io = socket(server, socketOption)
-const io = socket(server);
+const io = socket(server, socketOption);
+// const io = socket(server)
 let canvasArr = [];
-let playerArr = [];
-const pointsStack = (points) => {
-    canvasArr.push(points);
-};
-const clearAllCanvas = () => {
-    canvasArr = [];
-};
 class SocketMapHandler {
-    constructor(map) {
-        this.map = map;
+    constructor() {
         this.nowTime = () => new Date();
         this.setSocketId = (socketId) => this.map.set(socketId, this.nowTime());
         this.hasSocketId = (socketId) => this.map.has(socketId);
         this.getSocketId = (socketId) => this.map.get(socketId);
         this.deleteSocketId = (socketId) => this.hasSocketId(socketId) ? this.map.delete(socketId) : void 0;
-        this.map = map;
+        this.map = new Map();
     }
 }
 const canvasPointsMap = new Map();
 const hasOnPoints = (map, socketId, points) => map.has(points) || points !== null ? true : false;
 const setOnPoints = (map, socketId, pointsArr) => hasOnPoints(map, socketId, pointsArr) ? void 0 : map.set(socketId, pointsArr);
 const deleteOnPoints = (map, socketId, pointsArr) => { hasOnPoints(map, socketId, pointsArr) ? void 0 : map.delete(pointsArr); };
-const socketsIdMap = new Map(); //ユーザーIDをすべて入れるMapオブジェクト
-const sUser = new SocketMapHandler(socketsIdMap);
-// io.adapter(redis({host: "127.0.0.1", port: 5000}))
+const sUser = new SocketMapHandler();
 io.sockets.on('connection', (socket) => {
     sUser.setSocketId(socket.id);
     console.log(`socket connected: ${socket.id} :: ${sUser.getSocketId(socket.id)}`);
-    console.log(`now Player: ${socketsIdMap.size}`);
-    console.log(socketsIdMap);
+    console.log(`now Player: ${sUser.map.size}`);
     socket.on('firstConnect', (socketId) => {
         socket.emit('allCanvas', canvasArr);
         io.to(socketId).emit('s_to_c_id', { id: socketId });
     });
+    console.log(sUser.map);
+    sUser.map.clear();
     socket.on('chat', (data) => {
         io.sockets.emit('chat', data);
     });
