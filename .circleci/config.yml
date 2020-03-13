@@ -8,7 +8,7 @@ workflows:
     jobs:
       - deploy-prod
 jobs:
-	deploy:
+  deploy:
     executor: heroku/default
     steps:
       - checkout
@@ -18,9 +18,9 @@ jobs:
         command: bash .circleci/setup-heroku.sh
       - heroku/deploy-via-git:
         only-branch: master
-	deploy-prod:
-		machine:
-			image: circleci/classic:edge
+  deploy-prod:
+    machine:
+      image: circleci/classic:edge
     steps:
       - checkout
       - run:
