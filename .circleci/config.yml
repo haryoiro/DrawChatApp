@@ -22,6 +22,10 @@ jobs:
           name: Setup Heroku
           command: bash .circleci/setup-heroku.sh
       - heroku/install
+      - run:
+        name: deploy to heroku
+        command:  |
+          git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git master
       - heroku/deploy-via-git
   build:
     docker:
@@ -40,8 +44,4 @@ jobs:
             - node_modules
           key: v1-dependencies-{{ checksum "yarn.lock" }}
       - run: yarn build
-      - run:
-        name: deploy to heroku
-        command:  |
-          git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git master
         
