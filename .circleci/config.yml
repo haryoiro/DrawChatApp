@@ -19,10 +19,10 @@ jobs:
       - heroku/deploy-via-git:
         only-branch: master
   deploy-prod:
-    machine:
-      image: circleci/classic:edge
+    executor: heroku/default
     steps:
       - checkout
+      - heroku/install
       - run:
         name: heroku maintenance on
         command: heroku maintenance:on --app ${HEROKU_APP_NAME}
