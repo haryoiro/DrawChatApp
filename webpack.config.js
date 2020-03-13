@@ -61,7 +61,7 @@ const serverConfig = {
       use: "ts-loader",
       exclude: /node_modules/,
     }]
-  }
+  },
   resolve: {
     extensions: [".ts", ".tsx", ".js", ".jsx", ".css", ".html"]
   }
