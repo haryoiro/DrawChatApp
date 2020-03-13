@@ -1,8 +1,6 @@
 version: 2.1
-
 orbs:
-  heroku: circleci/heroku@1.0.1
-
+  heroku: circleci/heroku@1.0.0
 workflows:
   heroku_deploy:
     jobs:
@@ -15,19 +13,3 @@ jobs:
       - heroku/install
       - heroku/deploy-via-git:
           only-branch: master
-  build:
-    docker:
-      - image: circleci/node:12.13-stretch-browsers
-    steps:
-      - checkout
-
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "yarn.lock" }}
-            - v1-dependencies-
-      - run: yarn install
-      - save_cache:
-          paths:
-            - node_modules
-          key: v1-dependencies-{{ checksum "yarn.lock" }}
-      - run: yarn build
