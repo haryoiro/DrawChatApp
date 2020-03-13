@@ -308,7 +308,7 @@ export default class Tools extends Application {
       this.eraseTool()
       this.context2D.lineWidth =  this.initializePressure({pressure: 0.5})
       this.pencilTool(event);
-      this.stackPoint(this._simplePoints(event, this.initializePressure({pressure: 0.5})))
+      this.stackPoint(this._pressurePoints(event, this.initializePressure({pressure: 0.5})))
     }
   }
   public upMouseHandler(event: MouseEvent): void {
@@ -351,10 +351,8 @@ export default class Tools extends Application {
       : this.context2D.globalCompositeOperation = 'source-over'
   }
 
-  public eraOrPenSize():void {
-    this.eraserToggle
-      ? this.defRad = this.eraRadius
-      : this.defRad = this.penRadius
+  public eraOrPenSize():number {
+    return this.eraserToggle ? this.eraRadius : this.penRadius
   }
   public setPencilColor(color: string): void {
     this.canvasColor = color;
@@ -367,17 +365,17 @@ export default class Tools extends Application {
 
   // 異常な筆圧値を丸める、筆圧によりペンのサイズを漸強/漸弱させる
   public initializePressure(event: PointerEvent | {pressure: number}): number {
-    this.eraOrPenSize()
-    if (event.pressure < 0.995 || event.pressure > 0.05 || this.pressureToggle) {  // 標準的筆圧の場合は一定の処理
-      return event.pressure ? (this.defRad *= event.pressure) : (this.defRad / event.pressure);
-    } else if (event.pressure <= 0.05 || event.pressure > 0.01 || this.pressureToggle) { //  筆圧が弱すぎる場合は最低限の筆圧で処理
-      return this.defRad * 0.05;
-    } else if (event.pressure >= 0.995 || this.pressureToggle){  // 筆圧が強すぎる場合最大値の筆圧で処理
-      return this.defRad * 0.995
-    } else if (!this.pressureToggle) {  // 筆圧に対応していない場合は0.5で処理
-      return this.defRad * 0.5
+    let Rad: number = this.eraOrPenSize()
+    if (!this.pressureToggle || event.pressure === null){
+      return Rad * 0.5
+    } else if (event.pressure < 0.995 && event.pressure > 0.05 && this.pressureToggle) {  // 標準的筆圧の場合は一定の処理
+      return event.pressure ? Rad * event.pressure : Rad / event.pressure;
+    } else if (event.pressure <= 0.05 && event.pressure > 0.01 && this.pressureToggle) { //  筆圧が弱すぎる場合は最低限の筆圧で処理
+      return Rad * 0.05;
+    } else if (event.pressure >= 0.995 && this.pressureToggle){  // 筆圧が強すぎる場合最大値の筆圧で処理
+      return Rad * 0.995
     } else {
-      return this.defRad * 0.5
+      return Rad
     }
   }
 
@@ -411,12 +409,12 @@ export default class Tools extends Application {
       //@ts-ignore
       style.msTransform= scale;
   }
-  private _pressurePoints(event: PointerEvent, num: number): drawPointsObject{
+  private _pressurePoints(event: PointerEvent | MouseEvent, num: number): drawPointsObject{
     return {X: event.offsetX,Y: event.offsetY, p: num}
   }
-  private _simplePoints(event: MouseEvent, num: number): drawPointsObject{
-    return {X: event.offsetX,Y: event.offsetY, p: num}
-  }
+  // private _simplePoints(event: MouseEvent, num: number): drawPointsObject{
+  //   return {X: event.offsetX,Y: event.offsetY, p: num}
+  // }
   private abs(number: number){
     return (number * number)/2
   }
