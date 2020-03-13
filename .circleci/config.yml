@@ -18,6 +18,7 @@ jobs:
   deploy:
     docker:
       - image: circleci/node:12.13-stretch-browsers
+      - image: buildpack-deps:trusty
     steps:
       - run:
           command: 'git config --global core.quotepath false'
@@ -27,7 +28,6 @@ jobs:
           name: Deploy Master to Heroku
           command: |
             git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git master
-
   build:
     docker:
       - image: circleci/node:12.13-stretch-browsers
