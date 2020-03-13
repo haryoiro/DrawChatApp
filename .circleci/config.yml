@@ -4,39 +4,40 @@ orbs:
   heroku: circleci/heroku@1.0.1
 
 workflows:
-  heroku_deploy:
-    jobs:
-      - build
-      - deploy:
-        requires:
-          - build
-        filters:
-          branches:
-            only: master
+    heroku_deploy:
+        jobs:
+            - build
+            - deploy:
+                requires:
+                    - build
+                filters:
+                    branches:
+                    only: master
 jobs:
-  deploy:
-    docker:
-      - image: circleci/node:12.13-stretch-browsers
-    steps:
-      - checkout
-      - heroku/install
-      - run:
-        name: Setup Heroku
-        command: bash .circleci/setup-heroku.sh
-      - heroku/deploy-via-git:
-        only-branch: master
+    deploy:
+        docker:
+            - image: circleci/node:12.13-stretch-browsers
+        steps:
+            - checkout
+            - heroku/install
+            - run:
+                name: Setup Heroku
+                command: bash .circleci/setup-heroku.sh
+            - heroku/deploy-via-git:
+                only-branch: master
   build:
-    docker:
-      - image: circleci/node:12.13-stretch-browsers
-    working_directory: ~/app-drawn
-    steps:
-      - checkout
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "yarn.lock" }}
-            - v1-dependencies-
-      - run: yarn install
-      - save_cache:
-          paths:
-            - node_modules
-          key: v1-dependencies-{{ checksum "yarn.lock" }}
+      docker:
+          - image: circleci/node:12.13-stretch-browsers
+      working_directory: ~/repo
+      steps:
+          - checkout
+          - restore_cache:
+              keys:
+                  - v1-dependencies-{{ checksum "yarn.lock" }}
+                  - v1-dependencies-
+          - run: yarn install
+          - save_cache:
+              paths:
+                  - node_modules
+              key: v1-dependencies-{{ checksum "yarn.lock" }}
+          - run: yarn build
