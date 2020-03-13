@@ -104,7 +104,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var _a;
 // const socket = io("http://localhost:5000", {transports: [ 'websocket' ]})
 const socketOption = {
     reconnectionDelay: 50000,
@@ -169,7 +168,7 @@ class Tools extends Application {
         this.eraserToggle = false;
         this.pressureToggle = false;
         // ----- PenSize用プロパティ -----
-        this.defRad = 100;
+        this.defRad = 10;
         this.capStyle = 'round';
         this.joinStyle = 'round';
         this._pinchToggle = false;
@@ -531,7 +530,7 @@ class Buttons {
         this.chat = document.querySelector("#textChat");
         this.pencilSettingWindow = document.querySelector('.pencil-settings');
         this.eraserSettingWindow = document.querySelector('.eraser-settings');
-        this.chatWindow = document.querySelector('.chat-window')
+        this.chatWindow = document.querySelector('.chat-window');
     }
     elementActivate() {
         this.pencil.addEventListener('click', () => {
@@ -544,7 +543,7 @@ class Buttons {
             }
             this.pencilSettingWindow.classList.toggle('show', true);
             this.eraserSettingWindow.classList.toggle('show', false);
-            this.chatWindow.classList.toggle('show', false)
+            this.chatWindow.classList.toggle('show', false);
         });
         this.eraser.addEventListener('click', () => {
             this.eraser.classList.contains('active') ? this.eraser.classList.contains(' ') : this.eraser.classList.add('active');
@@ -556,27 +555,24 @@ class Buttons {
             }
             this.eraserSettingWindow.classList.toggle('show', true);
             this.pencilSettingWindow.classList.toggle('show', false);
-            this.chatWindow.classList.toggle('show', false)
+            this.chatWindow.classList.toggle('show', false);
         });
         this.chat.addEventListener('click', () => {
-            if(this.chat.classList.contains('active')){
-                this.pencil.classList.remove('active')
-                this.fill.classList.remove('active')
-                this.eraser.classList.remove('active')
+            if (this.chat.classList.contains('active')) {
+                this.pencil.classList.remove('active');
+                this.fill.classList.remove('active');
+                this.eraser.classList.remove('active');
             }
-            this.chatWindow.classList.toggle('show', true)
+            this.chatWindow.classList.toggle('show', true);
             this.pencilSettingWindow.classList.toggle('show', false);
             this.eraserSettingWindow.classList.toggle('show', false);
-        })
+        });
     }
 }
-
-const virtualCanvas = document.createElement('canvas').getContext('2d')
+const virtualCanvas = document.createElement('canvas').getContext('2d');
 document.addEventListener('pointermove', (event) => {
     // virtualCanvas.arc(event.pageX, event.pageY)
-})
-
-
+});
 const canvas = document.querySelector('#canvas');
 const graphic = canvas.getContext('2d');
 const view = new Tools(canvas, graphic);
@@ -587,11 +583,11 @@ const socketInit = new socketer();
 socketInit.pointerAsync();
 const domButton = new Buttons();
 domButton.elementActivate();
-const clearButton = document.getElementById('clear');
-(_a = clearButton) === null || _a === void 0 ? void 0 : _a.addEventListener('click', () => {
-    view.context2D.clearRect(0, 0, 1920, 1080);
-    socket.emit('clear');
-});
+// const clearButton = document.getElementById('clear')
+// clearButton?.addEventListener('click', () => {
+//   view.context2D.clearRect(0, 0, 1920, 1080)
+//   socket.emit('clear')
+// })
 
 
 /***/ })

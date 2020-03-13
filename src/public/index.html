@@ -12,22 +12,73 @@
 </head>
 
 <body>
+  <div class="header-timer">00:00 </div>
   <div class="pencil-settings window show">
-    <div class="setting-window-header"></div>
+    <div class="setting-window-header">
+    </div>
+
+    <div class="middle">
+      <div class="slider-container">
+        <p class="slider-tag">Size<div class="value-text pen-size-text">10</div> </p>
+        <div class="bar">
+            <input type="range" min="0" max="99" value="10" class="slider" id="pencil-rad">
+        </div>
+      </div>
+      <div class="slider-container">
+        <p class="slider-tag">Alpha<div class="value-text pen-alpha-text">10</div> </p>
+        <div class="bar">
+            <input type="range" min="0" max="99" value="10" class="slider" id="pencil-alpha">
+        </div>
+      </div>
+      <div class="slider-container">
+        <p class="slider-tag">Smooth<div class="value-text pen-smooth-text">10</div> </p>
+        <div class="bar">
+            <input type="range" min="0" max="99" value="10" class="slider" id="pencil-smooth">
+        </div>
+      </div>
+      <label class="switch">
+        <input type="checkbox" class="pressure-toggle">
+        <span class="checkSlider"></span>
+        <p class="switch-text">Pressure</p>
+      </label>
+    </div>
+
+
+
   </div>
   <div class="eraser-settings window">
-    <div class="setting-widow-header">
-      <h1>Pencil</h1>
+    <div class="setting-window-header">
+      <!-- <div class="header-title">ERASER</div> -->
+    </div>
+    <div class="middle">
+      <div class="slider-container">
+        <p class="slider-tag">Size<div class="value-text era-size-text">10</div> </p>
+        <div class="bar">
+            <input type="range" min="0" max="99" value="10" class="slider" id="erase-rad">
+        </div>
+      </div>
+      <div class="slider-container">
+        <p class="slider-tag">Alpha<div class="value-text era-alpha-text">10</div> </p>
+        <div class="bar">
+            <input type="range" min="0" max="99" value="10" class="slider" id="erase-alpha">
+        </div>
+      </div>
+      <div class="slider-container">
+        <p class="slider-tag">Smooth<div class="value-text era-smooth-text">10</div> </p>
+        <div class="bar">
+            <input type="range" min="0" max="99" value="10" class="slider" id="erase-smooth">
+        </div>
+      </div>
     </div>
   </div>
-  <div class="chat-window show">
-    <div class="chat-window-header">
-      <div class="signin"><p>Sign in</p></div>
+  <div class="chat-window">
+    <div class="setting-window-header">
+      <!-- <p class="signin"><p>Sign in</p></div> -->
     </div>
   </div>
   <div class="toolbar">
     <ul class="buttons">
-      <li id="bar" class="tools"><svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewbox="-15 -15 50 50"><path d="M.763,7.267H20.6a.724.724,0,0,0,.763-.677V4.9a.724.724,0,0,0-.763-.677H.763A.724.724,0,0,0,0,4.9V6.59A.724.724,0,0,0,.763,7.267Zm0,6.774H20.6a.724.724,0,0,0,.763-.677V11.67a.724.724,0,0,0-.763-.677H.763A.724.724,0,0,0,0,11.67v1.693A.724.724,0,0,0,.763,14.041Zm0,6.774H20.6a.724.724,0,0,0,.763-.677V18.444a.724.724,0,0,0-.763-.677H.763A.724.724,0,0,0,0,18.444v1.693A.724.724,0,0,0,.763,20.815Z" transform="translate(0 -4.219)"/></svg></li>
+      <li id="barg" class="tools"><svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewbox="-15 -15 50 50"><path d="M.763,7.267H20.6a.724.724,0,0,0,.763-.677V4.9a.724.724,0,0,0-.763-.677H.763A.724.724,0,0,0,0,4.9V6.59A.724.724,0,0,0,.763,7.267Zm0,6.774H20.6a.724.724,0,0,0,.763-.677V11.67a.724.724,0,0,0-.763-.677H.763A.724.724,0,0,0,0,11.67v1.693A.724.724,0,0,0,.763,14.041Zm0,6.774H20.6a.724.724,0,0,0,.763-.677V18.444a.724.724,0,0,0-.763-.677H.763A.724.724,0,0,0,0,18.444v1.693A.724.724,0,0,0,.763,20.815Z" transform="translate(0 -4.219)"/></svg></li>
       <li id="pencil" class="tools active"><svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewbox="-15 -15 50 50"><path d="M16.391,0,13.659,2.732,19.122,8.2l2.732-2.732ZM10.927,5.464,0,16.391v5.464H5.464L16.391,10.927Z" fill="#666668"/></svg></li>
       <li id="eraser" class="tools"><svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewbox="-15 -15 50 50"><path d="M22.2,13.038a2.14,2.14,0,0,0,0-3.027L15.069,2.877a2.14,2.14,0,0,0-3.027,0L.627,14.292a2.14,2.14,0,0,0,0,3.027L4.908,21.6a2.141,2.141,0,0,0,1.514.627H22.3a.535.535,0,0,0,.535-.535V19.908a.535.535,0,0,0-.535-.535H15.869L22.2,13.038ZM8.709,10.246l6.126,6.126-3,3H6.717L3.149,15.805l5.56-5.56Z" transform="translate(0 -2.25)" fill="#666668"/></svg></li>
       <li id="fill" class="tools"><svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewbox="-15 -15 50 50"><path d="M18.359,5.649V1.412A1.412,1.412,0,0,0,16.947,0H1.412A1.412,1.412,0,0,0,0,1.412V5.649A1.412,1.412,0,0,0,1.412,7.061H16.947A1.412,1.412,0,0,0,18.359,5.649Zm1.412-2.824V8.473a1.412,1.412,0,0,1-1.412,1.412H11.3A2.824,2.824,0,0,0,8.473,12.71v1.412a1.412,1.412,0,0,0-1.412,1.412v5.649A1.412,1.412,0,0,0,8.473,22.6H11.3a1.412,1.412,0,0,0,1.412-1.412V15.534A1.412,1.412,0,0,0,11.3,14.122V12.71h7.061A4.237,4.237,0,0,0,22.6,8.473V5.649A2.824,2.824,0,0,0,19.771,2.824Z" fill="#666668"/></svg></li>

@@ -1,22 +1,30 @@
-// const socket = io("http://localhost:5000", {transports: [ 'websocket' ]})
+// import io from "socket.io-client"
+
 const socketOption = {
   reconnectionDelay: 50000,
   transports: ['websocket', 'polling']
 }
+
+// const socket = io("http://localhost:5000")
 const socket = io("https://app-drawn.herokuapp.com", socketOption)
+
+import Buttons from './UI'
+import { threadId } from 'worker_threads'
 class Application{
   private _width!: number
   private _height!: number
+  protected _dpr: number
   constructor(public canvas: HTMLCanvasElement, public context2D: CanvasRenderingContext2D) {
     this.canvas = canvas;
     this.context2D = context2D;
+    this._dpr = window.devicePixelRatio || 1
   }
   public setUpView(
     width: number,
     height: number,
     color: string,
     hide: boolean = false,
-    smooth: boolean = false,
+    smooth: boolean = false
   ): void {
     this._settingCanvasSize(width, height);
     this._backgroundColor(color);
@@ -24,8 +32,10 @@ class Application{
     this._isImageSmoothing(smooth);
   }
   private _settingCanvasSize(width: number, height: number): void {
-    this.canvas.width = width;
-    this.canvas.height = height;
+    this.canvas.style.width = `${width / this._dpr}px`
+    this.canvas.style.height = `${height / this._dpr}px`
+    this.canvas.width = width / this._dpr;
+    this.canvas.height = height / this._dpr;
   }
   public clearAll(): void {
     this.context2D.clearRect(0, 0, this.width, this.height);
@@ -64,14 +74,14 @@ const eventStack: PointerEvent[] = [];
 interface drawPointsObject {
   X: MouseEvent | PointerEvent | number
   Y: MouseEvent | PointerEvent | number
-  pressure: MouseEvent | PointerEvent | number
+  p: MouseEvent | PointerEvent | number
 }
-class Tools extends Application {
+export default class Tools extends Application {
   // ----- ツール関連プロパティ
-  canvasColor:  string = "#000"
+  canvasColor:  string = "black"
   public drawToggle: boolean = false
   public eraserToggle: boolean  = false
-  private pressureToggle: boolean = false
+  public pressureToggle: boolean = false
   // ----- Pinch/Zoom用プロパティ -----
   private nowR!: number // 現在の拡大率
   private p1!: PointerEvent; // 最初に触れた指
@@ -90,10 +100,11 @@ class Tools extends Application {
   private zoomY!: number
   private isScale!: number
   // ----- PenSize用プロパティ -----
-  private defRad = 10;
-  private penRadius!: number
+  private defRad: number  = 10
+  public penRadius: number = 10
+  public eraRadius: number = 10
   private capStyle: CanvasLineCap = 'round'
-  private joinStyle: CanvasLineJoin = 'round';
+  private joinStyle: CanvasLineJoin = 'round'
   private scale!: string
 
   public drawPointObject!: drawPointsObject
@@ -105,25 +116,26 @@ class Tools extends Application {
   }
   public eventActivation(): void {
     if (window.PointerEvent) {
-      this.canvas.addEventListener('pointerdown', (event): void => this.downPointerController(event), {passive: false,});
-      this.canvas.addEventListener('pointerup', (event): void=> this.upPointerController(event), {passive: false,});
-      this.canvas.addEventListener('pointermove', (event): void => this.movePointerController(event), {passive: false,});
-      this.canvas.addEventListener('pointercancel',  (event): void => this.leavePointerHandler(event), {passive: false,});
+      this.canvas.addEventListener('pointerdown', (event): void => {event.preventDefault();this.downPointerController(event)}, {passive: false,});
+      this.canvas.addEventListener('pointerup', (event): void=> {event.preventDefault();this.upPointerController(event)}, {passive: false,});
+      this.canvas.addEventListener('pointermove', (event): void => {event.preventDefault();this.movePointerController(event)}, {passive: false,});
+      this.canvas.addEventListener('pointercancel',  (event): void => {event.preventDefault();this.leavePointerHandler(event)}, {passive: false,});
       document.addEventListener('wheel', (event) => {
         event.preventDefault();
-        this.nowR ? this.nowR : this.nowR = 1
-        this.zoomX = event.pageX
-        this.zoomY = event.pageY
+        if(isNaN(this.nowR)){this.nowR = 1}
         if(event.deltaY > 1){
           this.nowR -= 0.2
         } else if(event.deltaY < -1){
           this.nowR += 0.2
         }
+        this.zoomX = event.pageX
+        this.zoomY = event.pageY
         this._pinchHandle(event)
+
       }, {passive: false,})
-      // this.canvas.addEventListener('pointerleave', event => this.leavePointerHandler(event), {
-      //   passive: false,
-      // });
+      document.addEventListener('pointerleave', event => this.leavePointerHandler(event), {
+        passive: false,
+      });
       document.addEventListener('pointerout',  (event): void => this.leavePointerHandler(event), {passive: false,});
     } else {
       this.canvas.addEventListener('mousedown',  (event): void => this.downMouseHandler(event));
@@ -167,13 +179,18 @@ class Tools extends Application {
     );
   }
   public upPointerController(event: PointerEvent): void {
-    event.preventDefault()
-    this.pointerSwitcher(
-      event,
-      this.handlePenUp(event),
-      this.handleTouchUp(event),
-      this.handleMouseUp(event),
-    );
+    event.preventDefault();
+
+    if(eventStack){
+      this._removeEventStack(event);
+    }
+    this.drawToggle = false;
+
+    this.emitStack.push({color: this.canvasColor, cap: this.capStyle, join: this.joinStyle, erase: this.eraserToggle})
+    this.emitPoint(this.emitStack)
+    this.emitStack = []
+
+    this.context2D.beginPath();
   }
   // ---- PointerEvents ---
   // *------- DOWN -------
@@ -218,19 +235,23 @@ class Tools extends Application {
   public handlePenMove(event: PointerEvent): void {
     event.preventDefault();
     if (this.drawToggle) {
+      this.eraseTool()
       this.context2D.lineWidth = this.initializePressure(event)
       this.pencilTool(event);
-      this.stackPoint(this._puressurePoints(event))
+      this.stackPoint(this._pressurePoints(event, this.initializePressure(event)))
     }
   }
+  // *-- MouseMove if PointerEvent
   public handleMouseMove(event: PointerEvent): void {
     event.preventDefault();
     if (this.drawToggle) {
+      this.eraseTool()
       this.context2D.lineWidth = this.initializePressure(event)
       this.pencilTool(event);
-      this.stackPoint(this._simplePoints(event))
+      this.stackPoint(this._pressurePoints(event, this.initializePressure(event)))
     }
   }
+  // *-- TouchMove if PointerEvent
   public handleTouchMove(event: PointerEvent): void {
     event.preventDefault();
     for (let i = 0; i < eventStack.length; i++) {
@@ -244,11 +265,10 @@ class Tools extends Application {
     }
     this.p1 = eventStack[0];
     if (eventStack.length < 1 && this.drawToggle){
-      this.context2D.lineWidth = this.initializePressure(event)
       this.eraseTool();
-      this.settingPenConf(this.canvasColor, this.capStyle, this.joinStyle);
-      this.drawLine(event.offsetX, event.offsetY);
-      this.stackPoint(this._simplePoints(event))
+      this.context2D.lineWidth = this.initializePressure(event)
+      this.pencilTool(event)
+      this.stackPoint(this._pressurePoints(event, this.initializePressure(event)))
     }
     if (eventStack.length >= 2) {
       this.p2 = eventStack[1];
@@ -268,39 +288,11 @@ class Tools extends Application {
   }
 
   // ---- PointerEvents ---
-  // *--------  UP  --------
-  private handlePenUp(event: PointerEvent): void {
-    event.preventDefault();
-    this.drawToggle = false;
-    this.emitStack.push({color: this.canvasColor, cap: this.capStyle, join: this.joinStyle, erase: this.eraserToggle})
-    this.emitPoint(this.emitStack)
-    this.emitStack = []
-    this.context2D.beginPath();
-  }
-  private handleTouchUp(event: PointerEvent): void {
-    event.preventDefault();
-    this.drawToggle = false;
-    this.emitStack.push({color: this.canvasColor, cap: this.capStyle, join: this.joinStyle, erase: this.eraserToggle})
-    this.emitPoint(this.emitStack)
-    this.emitStack = []
-    this.context2D.beginPath();
-    this._removeEventStack(event);
-  }
-  private handleMouseUp(event: PointerEvent): void {
-    event.preventDefault();
-    this.drawToggle = false;
-    this.emitStack.push({color: this.canvasColor, cap: this.capStyle, join: this.joinStyle, erase: this.eraserToggle})
-    this.emitPoint(this.emitStack)
-    this.emitStack = []
-    this.context2D.beginPath();
-  }
-
-  // ---- PointerEvents ---
   // *------- LEAVE -------
   public leavePointerHandler(event: PointerEvent): void {
-    event.preventDefault()
+    this.drawToggle = false
+    this._removeEventStack(event)
     this.context2D.beginPath();
-    this.drawToggle = false;
   }
 
   // ---- MouseEvents ----
@@ -310,11 +302,12 @@ class Tools extends Application {
     this.drawToggle = true;
   }
   public moveMouseHandler(event: MouseEvent): void {
-    event.preventDefault
+    event.preventDefault()
     if (this.drawToggle) {
-      this.context2D.lineWidth =  this.defRad * 0.5
+      this.eraseTool()
+      this.context2D.lineWidth =  this.initializePressure({pressure: 0.5})
       this.pencilTool(event);
-      this.stackPoint(this._simplePoints(event))
+      this.stackPoint(this._simplePoints(event, this.initializePressure({pressure: 0.5})))
     }
   }
   public upMouseHandler(event: MouseEvent): void {
@@ -329,7 +322,6 @@ class Tools extends Application {
 
   // ---- PencilTools ----
   public pencilTool(event: MouseEvent): void {
-    this.eraseTool();
     this.settingPenConf(this.canvasColor, this.capStyle, this.joinStyle);
     this.drawLine(event.offsetX, event.offsetY);
   }
@@ -354,8 +346,14 @@ class Tools extends Application {
 
   public eraseTool(): void {
     this.eraserToggle
-      ? (this.context2D.globalCompositeOperation = 'destination-out')
-      : (this.context2D.globalCompositeOperation = 'source-over');
+      ? this.context2D.globalCompositeOperation = 'destination-out'
+      : this.context2D.globalCompositeOperation = 'source-over'
+  }
+
+  public eraOrPenSize():void {
+    this.eraserToggle
+      ? this.defRad = this.eraRadius
+      : this.defRad = this.penRadius
   }
   public setPencilColor(color: string): void {
     this.canvasColor = color;
@@ -368,18 +366,21 @@ class Tools extends Application {
 
   // 異常な筆圧値を丸める、筆圧によりペンのサイズを漸強/漸弱させる
   public initializePressure(event: PointerEvent | {pressure: number}): number {
-    let Rad = this.defRad;
-    if (event.pressure < 0.995 || event.pressure > 0.05) {
-      event.pressure ? (Rad *= event.pressure) : (Rad /= event.pressure);
-      return Rad;
-    } else if (event.pressure <= 0.05 || event.pressure > 0.01) {
-      return Rad *= 0.05;
-    } else if (event.pressure >= 0.995){
-      return Rad *= 0.995
+    this.eraOrPenSize()
+    if (event.pressure < 0.995 || event.pressure > 0.05 || this.pressureToggle) {  // 標準的筆圧の場合は一定の処理
+      event.pressure ? (this.defRad *= event.pressure) : (this.defRad /= event.pressure);
+      return this.defRad;
+    } else if (event.pressure <= 0.05 || event.pressure > 0.01 || this.pressureToggle) { //  筆圧が弱すぎる場合は最低限の筆圧で処理
+      return this.defRad *= 0.05;
+    } else if (event.pressure >= 0.995 || this.pressureToggle){  // 筆圧が強すぎる場合最大値の筆圧で処理
+      return this.defRad *= 0.995
+    } else if (!this.pressureToggle) {  // 筆圧に対応していない場合は0.5で処理
+      return this.defRad *= 0.5
     } else {
-      return Rad *= 0.5
+      return this.defRad *= 0.5
     }
   }
+
   // タッチイベントをスタックから削除
   private _removeEventStack(event: PointerEvent): void {
     for (let i = 0; i < eventStack.length; i++) {
@@ -392,16 +393,15 @@ class Tools extends Application {
   private _pinchHandle(event:WheelEvent | PointerEvent): void {
     let style = document.getElementById('canvas')!.style;
     let scale!: string
-    const dpr = window.devicePixelRatio || 1;
     if(this.nowR >= 20){
         this.nowR = 10
       }else if(this.nowR <= 0.05){
         this.nowR = 0.05
       }else{
-        style.transformOrigin = `${this.zoomX}px ${this.zoomY}px`
-        scale = `scale(${this.nowR * dpr})`;
+        // style.transformOrigin = `${this.zoomX}px ${this.zoomY}px`
+        style.transformOrigin  = `${this.zoomX}px ${this.zoomY}px`
+        scale = `scale(${this.nowR})`;
       }
-
       style.left = this.distX + 'px';
       style.top = this.distY + 'px';
       style.transform = scale;
@@ -411,11 +411,11 @@ class Tools extends Application {
       //@ts-ignore
       style.msTransform= scale;
   }
-  private _puressurePoints(event: PointerEvent): drawPointsObject{
-    return {X: event.offsetX,Y: event.offsetY,pressure: event.pressure}
+  private _pressurePoints(event: PointerEvent, num: number): drawPointsObject{
+    return {X: event.offsetX,Y: event.offsetY, p: num}
   }
-  private _simplePoints(event: MouseEvent): drawPointsObject{
-    return {X: event.offsetX,Y: event.offsetY,pressure: 0}
+  private _simplePoints(event: MouseEvent, num: number): drawPointsObject{
+    return {X: event.offsetX,Y: event.offsetY, p: num}
   }
   private abs(number: number){
     return (number * number)/2
@@ -439,138 +439,68 @@ class Tools extends Application {
   }
 }
 
-async function Timer(delay: number) {
-  return new Promise(resolve => {
-    setTimeout(() => resolve(), delay)
-  })
-}
 class socketer {
   constructor(){
   }
-
-  public async pointerAsync(){
-    await socket.on('allCanvas', async (canvas: any[]) => {
-      for (const o in canvas){
-        let points = canvas[o]
-
-        view.settingPenConf(points[points.length-1].color, points[points.length-1].cap, points[points.length-1].join);
-        if (points[points.length-1].erase){
-          view.context2D.globalCompositeOperation = 'destination-out'
-        }
-        for(let i in points){
-          view.context2D.lineWidth = view.initializePressure(points[i])
-          view.drawLine(points[i].X, points[i].Y);
-        }
-          view.eraseTool()
+  public pointerAsync(){
+    socket.on('allCanvas', (c: any[]) => {
+      for (let o in c){
+        let p = c[o]
+        view.settingPenConf(p[p.length-1].color, p[p.length-1].cap, p[p.length-1].join);
+        p[p.length-1].erase
+          ? view.context2D.globalCompositeOperation = 'destination-out'
+          : view.context2D.globalCompositeOperation =  'source-over'
+      for(let i in p){
+        view.context2D.lineWidth = p[i].p
+        view.drawLine(p[i].X, p[i].Y)
+      }
+      view.eraseTool()
+      view.context2D.beginPath()
       }
     })
-    await socket.on('point', async (points: any[]) => {
+
+    socket.on('point', (p: any[]) => {
+      view.settingPenConf(p[p.length-1].color, p[p.length-1].cap, p[p.length-1].join);
+      p[p.length-1].erase
+        ? view.context2D.globalCompositeOperation = 'destination-out'
+        : view.context2D.globalCompositeOperation =  'source-over'
+
+      console.log(p)
+      for (let i in p){
+        view.context2D.lineWidth =p[i].p
+        view.drawLine(p[i].X, p[i].Y);
+      }
+      view.eraseTool()
       view.context2D.beginPath()
-      view.settingPenConf(points[points.length-1].color, points[points.length-1].cap, points[points.length-1].join);
-      if (points[points.length-1].erase){
-        view.context2D.globalCompositeOperation = 'destination-out'
-      }
-      for(let i in points){
-        view.context2D.lineWidth = view.initializePressure(points[i])
-        view.drawLine(points[i].X, points[i].Y);
-        view.context2D.lineTo(points[i].X, points[i].Y);
-        view.context2D.stroke();
-        view.context2D.beginPath();
-        view.context2D.moveTo(points[i].X, points[i].Y);
-      }
-        view.eraseTool()
     })
     socket.on('clear', () => {
       view.context2D.clearRect(0, 0, 1920, 1080)
     })
   }
 }
-class Buttons {
-  private pencil!: HTMLElement
-  private eraser!: HTMLElement
-  private fill!: HTMLElement
-  private palatte!: HTMLElement
-  private dl!: HTMLElement
-  private chat!: HTMLElement
-  private pencilSettingWindow!: HTMLElement
-  private eraserSettingWindow!: HTMLElement
-  private chatWindow!: HTMLElement
-  constructor() {
-    this.pencil = <HTMLElement>document.querySelector("#pencil");
-    this.eraser = <HTMLElement>document.querySelector("#eraser");
-    this.fill = <HTMLElement>document.querySelector("#fill");
-    this.palatte = <HTMLElement>document.querySelector("#palatte");
-    this.dl = <HTMLElement>document.querySelector("#download");
-    this.chat = <HTMLElement>document.querySelector("#textChat");
-    this.pencilSettingWindow = <HTMLElement>document.querySelector('.pencil-settings');
-    this.eraserSettingWindow = <HTMLElement>document.querySelector('.eraser-settings');
-    this.chatWindow = <HTMLElement>document.querySelector('.chat-window')
-}
-elementActivate() {
-    this.pencil.addEventListener('click', () => {
-        this.pencil.classList.contains('active') ? this.pencil.classList.contains(' ') : this.pencil.classList.add('active');
-        if (this.pencil.classList.contains('active')) {
-            this.eraser.classList.remove('active');
-            this.fill.classList.remove('active');
-            this.pencil.classList.add('active');
-            view.eraserToggle = false;
-        }
-        this.pencilSettingWindow.classList.toggle('show', true);
-        this.eraserSettingWindow.classList.toggle('show', false);
-        this.chatWindow.classList.toggle('show', false)
-    });
-    this.eraser.addEventListener('click', () => {
-        this.eraser.classList.contains('active') ? this.eraser.classList.contains(' ') : this.eraser.classList.add('active');
-        if (this.eraser.classList.contains('active')) {
-            this.pencil.classList.remove('active');
-            this.fill.classList.remove('active');
-            this.eraser.classList.add('active');
-            view.eraserToggle = true;
-        }
-        this.eraserSettingWindow.classList.toggle('show', true);
-        this.pencilSettingWindow.classList.toggle('show', false);
-        this.chatWindow.classList.toggle('show', false)
-    });
-    this.chat.addEventListener('click', () => {
-        if(this.chat.classList.contains('active')){
-            this.pencil.classList.remove('active')
-            this.fill.classList.remove('active')
-            this.eraser.classList.remove('active')
-        }
-        this.chatWindow.classList.toggle('show', true)
-        this.pencilSettingWindow.classList.toggle('show', false);
-        this.eraserSettingWindow.classList.toggle('show', false);
-    })
-  }
-}
-
-
-const virtualCanvas = <CanvasRenderingContext2D>document.createElement('canvas').getContext('2d')
-document.addEventListener('pointermove', (event: PointerEvent) => {
-    // virtualCanvas.arc(event.pageX, event.pageY)
-})
-
-
 const canvas = <HTMLCanvasElement>document.querySelector('#canvas');
 const graphic = <CanvasRenderingContext2D>canvas.getContext('2d');
 
 const view = new Tools(canvas, graphic);
 
-// Application.prototype.serUpView
-//    (context , backgroundColor, hideMenu, smoothRendering)
-view.setUpView(1920, 1080, '#ffffff', true, false);
+(window.addEventListener('load', () => {
+  let myId:string
+
+  // Application.prototype.serUpView
+  //    (context , backgroundColor, hideMenu, smoothRendering)
+  view.setUpView(3840, 2160, '#ffffff', true, true);
 
 
-const socketInit = new socketer()
-socketInit.pointerAsync()
-
-const domButton = new Buttons()
-domButton.elementActivate()
+  const socketInit = new socketer()
+  socketInit.pointerAsync()
 
 
-// const clearButton = document.getElementById('clear')
-// clearButton?.addEventListener('click', () => {
-//   view.context2D.clearRect(0, 0, 1920, 1080)
-//   socket.emit('clear')
-// })
+  const domButton = new Buttons(view)
+  domButton.elementActivate()
 
+  socket.emit('firstConnect', socket.id)
+  socket.on('s_to_c_id', (id: string) => {
+    myId = id
+    console.log(myId)
+  })
+}))

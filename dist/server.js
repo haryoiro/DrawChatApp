@@ -111,7 +111,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 // const helmet = require("helmet")
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 4000;
 // app setup
 const app = express__WEBPACK_IMPORTED_MODULE_0___default()();
 const server = http__WEBPACK_IMPORTED_MODULE_1___default.a.createServer(app);
