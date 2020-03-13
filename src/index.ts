@@ -52,12 +52,7 @@ const io = socket(server, socketOption)
 
 
 let canvasArr: any[] = []
-const pointsStack = (points: any)  => {
-  canvasArr.push(points)
-}
-const clearAllCanvas = () => {
-  canvasArr = []
-}
+
 class SocketMapHandler {
   public map: Map<string, Date>
   constructor(){

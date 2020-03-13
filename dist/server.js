@@ -105,82 +105,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var cookie_parser__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(cookie_parser__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var path__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! path */ "path");
 /* harmony import */ var path__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(path__WEBPACK_IMPORTED_MODULE_4__);
-<<<<<<< HEAD
-
-
-
-
-
-// const helmet = require("helmet")
-const port = process.env.PORT || 4000;
-// app setup
-const app = express__WEBPACK_IMPORTED_MODULE_0___default()();
-const server = http__WEBPACK_IMPORTED_MODULE_1___default.a.createServer(app);
-// publicフォルダ設定
-app.use(express__WEBPACK_IMPORTED_MODULE_0___default.a.static(path__WEBPACK_IMPORTED_MODULE_4___default.a.join(__dirname, './public')));
-app.set('views', path__WEBPACK_IMPORTED_MODULE_4___default.a.join(__dirname, 'views'));
-app.set('view engine', 'pug');
-app.use(body_parser__WEBPACK_IMPORTED_MODULE_2___default.a.urlencoded({ extended: true }));
-app.use(body_parser__WEBPACK_IMPORTED_MODULE_2___default.a.json());
-app.use(cookie_parser__WEBPACK_IMPORTED_MODULE_3___default()());
-// app.use(helmet())
-// app.disable('x-powered-by')
-// // Sets "X-XSS-Protection: 1; mode=block".
-// app.use(helmet.xssFilter())
-// // Strict-Transport-Security
-// const sixtyDaysInSeconds = 31536000
-// app.use(helmet.hsts({
-//   maxAge: sixtyDaysInSeconds,
-//   includeSubDomains: true,
-//   preload: true
-// }))
-app.get("/", (req, res) => {
-    res.render('index', () => {
-        res.writeHead(200);
-    });
-});
-let canvasArr = [];
-let playerArr = [];
-const allCanvasStack = (points) => {
-    canvasArr.push(points);
-};
-const clearAllCanvas = () => {
-    canvasArr = [];
-};
-// ---- - Socket.IO -----
-const socketOption = {
-    cookie: false,
-    serveClient: false,
-    transports: ['websocket', 'polling']
-};
-// import socketio from "socket.io"
-const socket = __webpack_require__(/*! socket.io */ "socket.io");
-const io = socket(server, socketOption);
-// const io : socketio.Server = socketio(server).listen()
-// io.adapter(redis({host: "127.0.0.1", port: 5000}))
-io.on('connection', (socket) => {
-    console.log('made socket conenction', socket.id);
-    playerArr = [...playerArr, socket.id];
-    socket.emit('allCanvas', canvasArr);
-    console.log(playerArr);
-    console.log(`now Player: ${playerArr.length}`);
-    socket.on('chat', (data) => {
-        io.sockets.emit('chat', data);
-    });
-    socket.on('point', (points) => {
-        allCanvasStack(points);
-        socket.broadcast.emit('point', points);
-    });
-    socket.on('disconnect', (socket) => {
-        playerArr.splice(playerArr.indexOf(socket.id), 1);
-        console.log('socket disconnection', socket.id);
-    });
-    setInterval(() => { socket.emit('clearAll'); }, 30000);
-});
-server.listen(port, () => {
-    console.log(`listening to requests on port: ${port}`);
-});
-=======
 
 
 
@@ -279,7 +203,6 @@ io.sockets.on('connection', (socket) => {
 server.listen(port, () => {
     console.log(`listening to requests on port: ${port}`);
 });
->>>>>>> a61eea06bef93266b3902300af70f28e18e1870b
 
 
 /***/ }),
