@@ -9,7 +9,6 @@ const socketOption = {
 const socket = io("https://app-drawn.herokuapp.com", socketOption)
 
 import Buttons from './UI'
-import { threadId } from 'worker_threads'
 class Application{
   private _width!: number
   private _height!: number
@@ -32,8 +31,8 @@ class Application{
     this._isImageSmoothing(smooth);
   }
   private _settingCanvasSize(width: number, height: number): void {
-    this.canvas.style.width = `${width / this._dpr}px`
-    this.canvas.style.height = `${height / this._dpr}px`
+    this.canvas.style.width = `${width}px`
+    this.canvas.style.height = `${height}px`
     this.canvas.width = width;
     this.canvas.height = height;
   }
@@ -49,6 +48,8 @@ class Application{
     if(bool){
       document.addEventListener('contextmenu', e => e.preventDefault());
       document.addEventListener('MSHoldVisal', e => e.preventDefault());
+      document.getElemetnById('#canvasWrapper').addEventListener('contextmenu', e => e.preventDefault())
+      document.getElemetnById('#canvasWrapper').addEventListener('MSHoldVisal', e => e.preventDefault())
     }
   }
   private _isImageSmoothing(bool: boolean): void {
