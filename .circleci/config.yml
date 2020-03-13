@@ -27,7 +27,7 @@ jobs:
       - checkout
       - heroku/install
       - run:
-          command: "heroku git:remote --app app-drawn"
+          command: "heroku login"
       - run:
           name: heroku deploy
           command: |
