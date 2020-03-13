@@ -24,10 +24,15 @@ jobs:
       - checkout
       - heroku/install
       - run:
-          name: Deploy Master to Heroku
+          name: heroku maintenance on
+          command: heroku maintenance:on --app ${HEROKU_APP_NAME_PROD}
+      - run:
+          name: heroku deploy
           command: |
             git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git master
-  build:
+      - run:
+          name: heroku maintenance off
+          command: heroku maintenance:off --app ${HEROKU_APP_NAME_PROD}  build:
     docker:
       - image: circleci/node:12.13-stretch-browsers
     steps:
