@@ -2,21 +2,13 @@ version: 2.1
 
 orbs:
   heroku: circleci/heroku@1.0.1
- 
+
 workflows:
   heroku_deploy:
     jobs:
       - build
-      - deploy:
-         requires:
-            - build
-         filters:
-            branches:
-              only: master
 jobs:
   deploy:
-    environment:
-      HEROKU_APP: "app-drawn"
     docker:
       - image: circleci/node:12.13-stretch-browsers
     steps:
