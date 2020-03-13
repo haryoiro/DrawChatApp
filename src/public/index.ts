@@ -267,9 +267,9 @@ export default class Tools extends Application {
     this.p1 = eventStack[0];
     if (eventStack.length < 1 && this.drawToggle){
       this.eraseTool();
-      this.context2D.lineWidth = this.initializePressure(event)
-      this.pencilTool(event)
-      this.stackPoint(this._pressurePoints(event, this.initializePressure(event)))
+      this.context2D.lineWidth = this.initializePressure(eventStack[0])
+      this.pencilTool(eventStack[0])
+      this.stackPoint(this._pressurePoints(eventStack[0], this.initializePressure(eventStack[0])))
     }
     if (eventStack.length >= 2) {
       this.p2 = eventStack[1];
@@ -369,16 +369,15 @@ export default class Tools extends Application {
   public initializePressure(event: PointerEvent | {pressure: number}): number {
     this.eraOrPenSize()
     if (event.pressure < 0.995 || event.pressure > 0.05 || this.pressureToggle) {  // 標準的筆圧の場合は一定の処理
-      event.pressure ? (this.defRad *= event.pressure) : (this.defRad /= event.pressure);
-      return this.defRad;
+      return event.pressure ? (this.defRad *= event.pressure) : (this.defRad / event.pressure);
     } else if (event.pressure <= 0.05 || event.pressure > 0.01 || this.pressureToggle) { //  筆圧が弱すぎる場合は最低限の筆圧で処理
-      return this.defRad *= 0.05;
+      return this.defRad * 0.05;
     } else if (event.pressure >= 0.995 || this.pressureToggle){  // 筆圧が強すぎる場合最大値の筆圧で処理
-      return this.defRad *= 0.995
+      return this.defRad * 0.995
     } else if (!this.pressureToggle) {  // 筆圧に対応していない場合は0.5で処理
-      return this.defRad *= 0.5
+      return this.defRad * 0.5
     } else {
-      return this.defRad *= 0.5
+      return this.defRad * 0.5
     }
   }
 
