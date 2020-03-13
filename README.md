@@ -1,10 +1,11 @@
 # doodland
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 "doodland" is simple chat web application with drawing!!!
 
-###  Auto Deploy to Heroku and CircleCI when push to this repository as master branch
+Auto Deploy to Heroku and CircleCI when push to this repository as master branch
 [![CircleCI](https://circleci.com/gh/haryoiro/TS_DrawChatApp/tree/master.svg?style=svg)](https://circleci.com/gh/haryoiro/TS_DrawChatApp/tree/master)
 
 ### Deploy to Heroku
-#### you shouldn't deploy when pushed this repository
+you shouldn't deploy when pushed this repository
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
