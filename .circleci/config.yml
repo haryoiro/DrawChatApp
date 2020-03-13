@@ -17,6 +17,8 @@ jobs:
   deploy:
     executor: heroku/default
     steps:
+      - run: 
+          command: 'git config --global core.quotepath false'
       - checkout
       - heroku/install
       - run:
