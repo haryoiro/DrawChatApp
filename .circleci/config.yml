@@ -7,7 +7,13 @@ orbs:
 workflows:
   heroku_deploy:
     jobs:
-      - heroku/deploy-via-git
+      - build
+      - deploy:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
 jobs:
   deploy:
     docker:
@@ -20,7 +26,6 @@ jobs:
       - run:
           name: Setup Heroku
           command: bash .circleci/setup-heroku.sh
-      - heroku/deploy-via-git
   build:
     docker:
       - image: circleci/node:12.13-stretch-browsers
