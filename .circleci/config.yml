@@ -23,10 +23,15 @@ jobs:
           command: 'git config --global core.quotepath false'
       - checkout
       - heroku/install
-      - run:
-          name: Deploy Master to Heroku
+      - add_ssh_key:
+          fingerprints:
+            - ${HEROKU_SSH}
+      -deploy:
+          name: Heroku deploy
           command: |
-            git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git master
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              git push heroku master
+            fi
   build:
     docker:
       - image: circleci/node:12.13-stretch-browsers
