@@ -15,6 +15,10 @@ workflows:
               only: master
 jobs:
   deploy:
+    machine:
+        enabled: true
+    environment:
+      HEROKU_APP: "app-drawn"
     docker:
       - image: circleci/node:12.13-stretch-browsers
       - image: buildpack-deps:trusty
