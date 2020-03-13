@@ -23,9 +23,6 @@ jobs:
           command: 'git config --global core.quotepath false'
       - checkout
       - heroku/install
-      - add_ssh_key:
-          fingerprints:
-            - ${HEROKU_SSH}
       - run:
           name: Heroku deploy
           command: |
