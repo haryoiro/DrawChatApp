@@ -18,7 +18,7 @@ references:
 
 executors:
   heroku-default:
-    docker:
+    - docker:
       - image: circleci/node:12.13-stretch-browsers
 
 workflows:
