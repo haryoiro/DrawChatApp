@@ -1,4 +1,4 @@
-# Drawn
+# doodland
 "doodland" is simple chat web application with drawing!!!
 
 ###  Auto Deploy to Heroku and CircleCI when push to this repository as master branch
