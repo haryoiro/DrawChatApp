@@ -6,13 +6,7 @@ orbs:
 workflows:
   heroku_deploy:
     jobs:
-      - build
-      - deploy:
-          requires:
-            - build
-          filters:
-            branches:
-              only: master
+      - deploy
 jobs:
   deploy:
     environment:
