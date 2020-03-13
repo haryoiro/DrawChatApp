@@ -9,12 +9,8 @@ workflows:
       - deploy
 jobs:
   deploy:
-    environment:
-      HEROKU_APP: "app-drawn"
     executor: heroku/default
     steps:
-      - run:
-          command: 'git config --global core.quotepath false'
       - checkout
       - heroku/install
       - heroku/deploy-via-git:
