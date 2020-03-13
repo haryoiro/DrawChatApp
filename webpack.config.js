@@ -1,5 +1,4 @@
 const nodeExternals = require('webpack-node-externals')
-const NodemonPlugin = require('nodemon-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const path = require('path')
 
@@ -36,8 +35,6 @@ const clientConfig = {
   plugins: [
     new HtmlWebpackPlugin({
       template: "./src/public/index.html"
-    }),
-    new NodemonPlugin({
     })
   ]
 }
