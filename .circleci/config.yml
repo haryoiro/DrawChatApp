@@ -19,21 +19,10 @@ jobs:
       HEROKU_APP: "app-drawn"
     docker:
       - image: circleci/node:12.13-stretch-browsers
-      - image: buildpack-deps:trusty
     steps:
       - run:
           command: "git config --global core.quotepath false"
-      
       - checkout
-      - heroku/install
-      - run:
-          name: Heroku
-          command: |
-            docker build --rm=false -t registry.heroku.com/app-drawn/web .
-            docker login --username=$HEROKU_EMAIL --password=$(heroku auth:token) registry.heroku.com
-            docker push registry.heroku.com/app-drawn/web
-            git push https://heroku:$HEROKU_API_KEY@git.heroku.com/app-drawn.git master
-
   build:
     docker:
       - image: circleci/node:12.13-stretch-browsers
