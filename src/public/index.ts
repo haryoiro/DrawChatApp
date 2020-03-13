@@ -34,8 +34,8 @@ class Application{
   private _settingCanvasSize(width: number, height: number): void {
     this.canvas.style.width = `${width / this._dpr}px`
     this.canvas.style.height = `${height / this._dpr}px`
-    this.canvas.width = width / this._dpr;
-    this.canvas.height = height / this._dpr;
+    this.canvas.width = width;
+    this.canvas.height = height;
   }
   public clearAll(): void {
     this.context2D.clearRect(0, 0, this.width, this.height);
@@ -100,7 +100,7 @@ export default class Tools extends Application {
   private zoomY!: number
   private isScale!: number
   // ----- PenSize用プロパティ -----
-  private defRad: number  = 10
+  private defRad: number  = 10;
   public penRadius: number = 10
   public eraRadius: number = 10
   private capStyle: CanvasLineCap = 'round'
