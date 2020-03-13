@@ -1,53 +1,45 @@
+
 version: 2.1
 
 orbs:
   heroku: circleci/heroku@1.0.1
 
-
-references:
-  save_node_modules: &save_node_modules
-    save_cache:
-      paths:
-        - node_modules
-      key: v1-dependencies-{{ checksum "yarn.lock" }}
-  restore_node_modules: &restore_node_modules
-    restore_cache:
-      keys:
-        - v1-dependencies-{{ checksum "yarn.lock" }}
-        - v1-dependencies-
-
-executors:
-  heroku-default:
-    - docker:
-      - image: circleci/node:12.13-stretch-browsers
-
 workflows:
-    heroku_deploy:
-        jobs:
+  heroku_deploy:
+    jobs:
+      - build
+      - deploy:
+          requires:
             - build
-            - deploy:
-                requires:
-                    - build
-                filters:
-                    branches:
-                    only: master
-
+          filters:
+            branches:
+              only: master
 jobs:
   deploy:
-      executors: heroku-default
-      steps:
-          - checkout
-          - heroku/install
-          - run:
-              name: Setup Heroku
-              command: bash .circleci/setup-heroku.sh
-          - heroku/deploy-via-git:
-              only-branch: master
+    docker:
+      - image: circleci/node:12.13-stretch-browsers
+    steps:
+      - run:
+          command: 'git config --global core.quotepath false'
+      - checkout
+      - heroku/install
+      - run:
+          name: Setup Heroku
+          command: bash .circleci/setup-heroku.sh
+      - heroku/deploy-via-git
   build:
-      executors: heroku-default
-      steps:
-          - checkout
-          - *restore_node_modules
-          - run: yarn install
-          - *save_node_modules
-          - run: yarn build
+    docker:
+      - image: circleci/node:12.13-stretch-browsers
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum \"yarn.lock\" }}
+            - v1-dependencies-
+      - run: yarn install
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum \"yarn.lock\" }}
+      - run: yarn build
