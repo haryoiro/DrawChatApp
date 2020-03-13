@@ -15,7 +15,6 @@ workflows:
               only: master
 jobs:
   deploy:
-
     environment:
       HEROKU_APP: "app-drawn"
     docker:
