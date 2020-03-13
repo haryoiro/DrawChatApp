@@ -23,10 +23,11 @@ jobs:
     steps:
       - run:
           command: "git config --global core.quotepath false"
-      - run:
-          command: "git pull heroku master"
+      
       - checkout
       - heroku/install
+      - run:
+          command: "heroku git:remote --app app-drawn"
       - run:
           name: heroku deploy
           command: |
