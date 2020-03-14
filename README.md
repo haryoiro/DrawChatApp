@@ -11,6 +11,7 @@
  [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
  
  Auto Deploy to Heroku and CircleCI when push to this repository as master branch
+ 
  [![CircleCI](https://circleci.com/gh/haryoiro/TS_DrawChatApp/tree/master.svg?style=svg)](https://circleci.com/gh/haryoiro/TS_DrawChatApp/tree/master)
 
 This software is released under the MIT License, see LICENSE.
