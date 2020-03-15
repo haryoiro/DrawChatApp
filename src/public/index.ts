@@ -377,7 +377,7 @@ export default class Tools extends Application {
     } else if (event.pressure >= 0.995 && this.pressureToggle){  // 筆圧が強すぎる場合最大値の筆圧で処理
       return Rad * 0.995
     } else {
-      return Rad
+      return Rad * 0.5
     }
   }
 
