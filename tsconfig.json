@@ -6,7 +6,7 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "strict": true,
-    "types": ["node", "express", "socket.io", "socket.io-client", "cookie-parser"],
+    "types": ["node", "express", "socket.io", "socket.io-client"],
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true
   },

@@ -1,6 +1,7 @@
 // import io from "socket.io-client"
 import './style.css'
 import Buttons from './UI'
+import io from 'socket.io-client'
 
 const socketOption = {
   reconnectionDelay: 50000,
@@ -398,7 +399,7 @@ export default class Tools extends Application {
         this.nowR = 0.05
       }else{
         // style.transformOrigin = `${this.zoomX}px ${this.zoomY}px`
-        style.transformOrigin  = `${this.zoomX + 6 + (this.canvas.offsetLeft / 2)}px ${this.zoomY + (this.canvas.offsetTop / 2)}px`
+        style.transformOrigin  = `${this.zoomX + 6 + (this.canvas.offsetLeft/2)}px ${this.zoomY + (this.canvas.offsetTop/2)}px`
         scale = `scale(${this.nowR})`;
       }
       style.left = this.distX + 'px';
