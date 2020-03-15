@@ -6,12 +6,12 @@
 
 
 #### Deploy to Heroku
- you shouldn't deploy when pushed this repository
-
- [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
- 
- Auto Deploy to Heroku and CircleCI when push to this repository as master branch
- 
+Auto Deploy to Heroku and CircleCI when push to this repository as master branch
  [![CircleCI](https://circleci.com/gh/haryoiro/TS_DrawChatApp/tree/master.svg?style=svg)](https://circleci.com/gh/haryoiro/TS_DrawChatApp/tree/master)
 
+
+ you shouldn't deploy when pushed this repository
+ [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+ 
+ 
 This software is released under the MIT License, see LICENSE.
